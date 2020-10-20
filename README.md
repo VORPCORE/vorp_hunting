@@ -14,4 +14,4 @@
 * To change the language go to ```resources/vorp_hunting/config.lua```
 * Now you are ready!
 
-Credits to the original juan_hunting script
+Credits to [zebbyskitzoo](https://github.com/OTRP) for the original config
