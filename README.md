@@ -1,5 +1,5 @@
 # VORP-Hunting
-🐄 Selling Animals &amp; Skins script
+🐄 Selling Animals &amp; Big Fish (the ones that don't go to the inventory) script
 
 ## Requirements
 - [VORP-Core](https://github.com/VORPCORE/VORP-Core/releases)
@@ -14,4 +14,4 @@
 * To change the language go to ```resources/vorp_hunting/config.lua```
 * Now you are ready!
 
-Credits to [zebbyskitzoo](https://github.com/OTRP) for the original config
+Credits to [zebbyskitzoo](https://github.com/OTRP) &amp; [CryptoGenics](https://github.com/CryptoGenics) for the original config
