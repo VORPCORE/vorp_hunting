@@ -1,5 +1,4 @@
 local VORPCore = {}
-
 Citizen.CreateThread(function()
     while not VORPCore do        
         TriggerEvent("getCore", function(core)
@@ -16,26 +15,30 @@ end)
 
 function startButchers() -- Loading Butchers Function
     for i,v in ipairs(Config.Butchers) do 
-        -- Loading Model
-        local hashModel = GetHashKey(v.npcmodel) 
-        if IsModelValid(hashModel) then 
-            RequestModel(hashModel)
-            while not HasModelLoaded(hashModel) do                
-                Wait(100)
-            end
-        else 
-            print(v.npcmodel .. " is not valid") -- Concatenations
-        end        
-        -- Spawn Ped
-        local x, y, z = table.unpack(v.coords)
-        local npc = CreatePed(hashModel, x, y, z, v.heading, false, true, true, true)
-        Citizen.InvokeNative(0x283978A15512B2FE, npc, true) -- SetRandomOutfitVariation
-        SetEntityNoCollisionEntity(PlayerPedId(), npc, false)
-        SetEntityCanBeDamaged(npc, false)
-        SetEntityInvincible(npc, true)
-        Wait(1000)
-        FreezeEntityPosition(npc, true) -- NPC can't escape
-        SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
+        if Config.aiButcherped then 
+            -- Loading Model
+            local hashModel = GetHashKey(v.npcmodel) 
+            if IsModelValid(hashModel) then 
+                RequestModel(hashModel)
+                while not HasModelLoaded(hashModel) do                
+                    Wait(100)
+                end
+            else 
+                print(v.npcmodel .. " is not valid") -- Concatenations
+            end        
+            -- Spawn Ped
+            local x, y, z = table.unpack(v.coords)
+            local npc = CreatePed(hashModel, x, y, z, v.heading, false, true, true, true)
+            Citizen.InvokeNative(0x283978A15512B2FE, npc, true) -- SetRandomOutfitVariation
+            SetEntityNoCollisionEntity(PlayerPedId(), npc, false)
+            SetEntityCanBeDamaged(npc, false)
+            SetEntityInvincible(npc, true)
+            Wait(1000)
+            FreezeEntityPosition(npc, true) -- NPC can't escape
+            SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
+        end
+
+
         local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
         SetBlipSprite(blip, v.blip, true) -- Blip Texture
         Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
@@ -58,8 +61,8 @@ function sellAnimal() -- Selling animal function
     local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
     local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
     local model = GetEntityModel(holding)
-    local pedtype = GetPedType(holding)
-    if holding ~= false then -- Checking if you are holding an animal        
+    local pedtype = GetPedType(holding) 
+    if holding ~= false then -- Checking if you are holding an animal  
         if Config.Animals[model] ~= nil then -- Paying for animals
             local animal = Config.Animals[model]
             local givenItem = animal.givenItem
@@ -127,16 +130,44 @@ end
 
 Citizen.CreateThread(function()
     while true do
+        local sleep = true
         for i,v in ipairs(Config.Butchers) do
-            local playerCoords = GetEntityCoords(PlayerPedId())           
+            local playerCoords = GetEntityCoords(PlayerPedId())       
             if Vdist(playerCoords, v.coords) <= v.radius then -- Checking distance between player and butcher
+                local job
+                sleep = false
                 drawTxt(v.pressToSell, 0.5, 0.9, 0.7, 0.7, 255, 255, 255, 255, true, true)
-                if IsControlJustPressed(2, 0xD9D0E1C0) then                  
-                    sellAnimal() -- Sell Function     
-                    Citizen.Wait(200)           
+                if IsControlJustPressed(2, 0xD9D0E1C0) then
+                    if Config.joblocked then 
+                        TriggerEvent('vorp:ExecuteServerCallBack','vorp_hunting:getjob', function(result)  
+                            job =   result
+                        end)
+                        while job == nil do 
+                            Wait(100)
+                        end
+                        if job == v.butcherjob then 
+                            sellAnimal()     
+                            Citizen.Wait(200)
+                        else
+                            TriggerEvent("vorp:TipRight", Config.Language.notabutcher.." : "..v.butcherjob, 4000) 
+                        end
+                    else
+                        sellAnimal()  
+                        Citizen.Wait(200)
+                    end         
                 end
             end
-        end   
+        end  
+        if sleep then 
+            Citizen.Wait(500)
+        end 
         Citizen.Wait(1)
     end
+end)
+
+RegisterCommand("test", function(source, args, rawCommand)
+    TriggerEvent('vorp:ExecuteServerCallBack','vorp_hunting:getjob', function(result)  
+        local job =   result                       
+        print(job)
+    end)
 end)
