@@ -15,6 +15,7 @@ end)
 
 function startButchers() -- Loading Butchers Function
     for i,v in ipairs(Config.Butchers) do 
+        local x, y, z = table.unpack(v.coords)
         if Config.aiButcherped then 
             -- Loading Model
             local hashModel = GetHashKey(v.npcmodel) 
@@ -27,7 +28,6 @@ function startButchers() -- Loading Butchers Function
                 print(v.npcmodel .. " is not valid") -- Concatenations
             end        
             -- Spawn Ped
-            local x, y, z = table.unpack(v.coords)
             local npc = CreatePed(hashModel, x, y, z, v.heading, false, true, true, true)
             Citizen.InvokeNative(0x283978A15512B2FE, npc, true) -- SetRandomOutfitVariation
             SetEntityNoCollisionEntity(PlayerPedId(), npc, false)
@@ -37,8 +37,6 @@ function startButchers() -- Loading Butchers Function
             FreezeEntityPosition(npc, true) -- NPC can't escape
             SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
         end
-
-
         local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
         SetBlipSprite(blip, v.blip, true) -- Blip Texture
         Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
