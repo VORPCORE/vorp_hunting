@@ -1,7 +1,7 @@
 Config = { }
 
 Config.Language = {
-    ["NotHoldingAnimal"] = "You aren't holding an animal",
+    ["NotHoldingAnimal"] = "You Got Nothing To Sell",
     ["NotInTheButcher"] = "I won't buy that animal",
     ["AnimalSold"] = "Thanks for the deal!",
     notabutcher = "You Dont Have The Right Job",
