@@ -252,7 +252,8 @@ Citizen.CreateThread(function()
                     else
                         sellAnimal()  
                         Citizen.Wait(200)
-                    end         
+                    end     
+                    Citizen.Wait(1000)    
                 end
             end
         end  
@@ -262,14 +263,3 @@ Citizen.CreateThread(function()
         Citizen.Wait(1)
     end
 end)
-
-RegisterCommand("hunt", function(source, args, rawCommand)
-    local playerCoords = GetEntityCoords(PlayerPedId()) 
-     local farm2 = GetHashKey("a_c_goat_01")       
-     RequestModel(farm2)
-     while not HasModelLoaded(farm2) do
-         Wait(10)
-     end
-    farm2 = CreatePed("a_c_goat_01", playerCoords.x, playerCoords.y, playerCoords.z, true, true, true)
-    Citizen.InvokeNative(0x77FF8D35EEC6BBC4, farm2, 1, 0)
- end, false)
