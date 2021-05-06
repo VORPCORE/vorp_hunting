@@ -206,7 +206,7 @@ Citizen.CreateThread(function()
                     PromptSetEnabled(prompt, 1)
                     PromptSetVisible(prompt, 1) 
                     local model = GetEntityModel(holding)
-                    if holding ~= false and Config.Animals[model] == nil then
+                    if holding ~= false and Config.Animals[model] == nil and Citizen.InvokeNative(0x255B6DB4E3AD3C3E, holding) then
                         if PromptIsJustPressed(prompt) then 
                             TaskPlaceCarriedEntityOnMount(PlayerPedId(),holding,horse,1)
                             table.insert(peltz, {
@@ -252,8 +252,8 @@ Citizen.CreateThread(function()
                     else
                         sellAnimal()  
                         Citizen.Wait(200)
-                    end     
-                    Citizen.Wait(1000)    
+                    end  
+                    Citizen.Wait(1000)       
                 end
             end
         end  
