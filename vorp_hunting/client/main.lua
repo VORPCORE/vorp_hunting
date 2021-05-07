@@ -162,31 +162,20 @@ function sellAnimal() -- Selling animal function
     if Citizen.InvokeNative(0xA911EE21EDF69DAF,horse) == false and holding == false and Citizen.InvokeNative(0x0CEEB6F4780B1F2F,horse,0) == false then
         TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000) -- Notification when you don't have an animal to sell
     end
+    TriggerEvent("syn_clan:pelts",peltz)
 end
 
-local prompt 
-local promptGroup
 local varStringCasa = CreateVarString(10, "LITERAL_STRING", "Stow Pelt")
 AddEventHandler(
     "onResourceStop",
     function(resourceName)
         if resourceName == GetCurrentResourceName() then
-            PromptDelete(prompt)
         end
     end
 )
-Citizen.CreateThread(function()
-    prompt = PromptRegisterBegin()
-    PromptSetActiveGroupThisFrame(promptGroup, varStringCasa)
-    PromptSetControlAction(prompt, 0x760A9C6F)
-    PromptSetText(prompt, CreateVarString(10, "LITERAL_STRING", "Stow Pelt"))
-    PromptSetStandardMode(prompt, true)
-    PromptSetEnabled(prompt, 0)
-    PromptSetVisible(prompt, 0)
-    PromptSetHoldMode(prompt, 1)
-    N_0x0c718001b77ca468(prompt, 3.0)
-    PromptSetGroup(prompt, promptGroup)
-    PromptRegisterEnd(prompt)
+RegisterNetEvent("vorp_hunting:pelts")
+AddEventHandler("vorp_hunting:pelts", function(pelts)
+    peltz = pelts
 end)
 
 Citizen.CreateThread(function()
@@ -202,25 +191,18 @@ Citizen.CreateThread(function()
 
                local dist = GetDistanceBetweenCoords(playerCoords.x,playerCoords.y,playerCoords.z,horsecoords.x,horsecoords.y,horsecoords.z,0)
                if 2 > dist then 
-                    PromptSetPosition(prompt, horsecoords.x, horsecoords.y, horsecoords.z)
-                    PromptSetEnabled(prompt, 1)
-                    PromptSetVisible(prompt, 1) 
                     local model = GetEntityModel(holding)
-                    if holding ~= false and Config.Animals[model] == nil and Citizen.InvokeNative(0x255B6DB4E3AD3C3E, holding) then
-                        if PromptIsJustPressed(prompt) then 
+                    if holding ~= false and Config.Animals[model] == nil then
+                        drawTxt("Press G to Stow", 0.5, 0.9, 0.7, 0.7, 255, 255, 255, 255, true, true)
+                        if IsControlJustPressed(2, 0x760A9C6F) then
                             TaskPlaceCarriedEntityOnMount(PlayerPedId(),holding,horse,1)
                             table.insert(peltz, {
                                 holding = holding,
                                 quality = quality
-                              })
+                            })
+                            TriggerEvent("syn_clan:pelts",peltz)
                         end 
-                    else
-                        PromptSetEnabled(prompt, 0)
-                        PromptSetVisible(prompt, 0) 
                     end
-                else
-                    PromptSetEnabled(prompt, 0)
-                    PromptSetVisible(prompt, 0) 
                end
         end
     end
