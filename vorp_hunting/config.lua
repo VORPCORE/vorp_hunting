@@ -14,7 +14,7 @@ Config.ItemQuantity = {
 
 Config.aiButcherped = true -- spawn ai butched ped set to false if you dont want an ai butcher ped to spawn 
 Config.joblocked = false -- lock the butcher so only people with the job can access. u can change access to each butcher by editing this  ["butcherjob"] = "butcher"
-
+Config.maxpelts = 2 -- max pelts allowed on back of horse
 
 Config.Butchers = {
     {["butchername"] = "Valentine Butcher", ["butcherjob"] = "butcher",    ["pressToSell"] = "Press [~e~Space~q~] to sell",  ["blip"] = 1369919445,  ["npcmodel"] = "S_M_M_UNIBUTCHERS_01",  ["coords"] = vector3(-339.0141, 767.6358, 115.5645),    ["heading"] = 100.41544342041,   ["radius"] = 3.0},

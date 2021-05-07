@@ -110,7 +110,8 @@ function sellAnimal() -- Selling animal function
                 else
                     TriggerEvent("vorp:TipRight", Config.Language.AnimalSold, 4000) -- Sold notification
                     Citizen.InvokeNative(0x627F7F3A0C4C51FF,horse,pelt)
-                end   
+                end 
+                table.remove(peltz, x)  
             end
         end
     end
@@ -177,7 +178,13 @@ RegisterNetEvent("vorp_hunting:pelts")
 AddEventHandler("vorp_hunting:pelts", function(pelts)
     peltz = pelts
 end)
-
+function keys(table)
+    local num = 0
+    for k,v in pairs(table) do
+        num = num + 1
+    end
+    return num
+end
 Citizen.CreateThread(function()
     while true do
         Wait(2)
@@ -188,20 +195,21 @@ Citizen.CreateThread(function()
             local horsecoords =  GetEntityCoords(horse) 
             local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId())
             local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
-
                local dist = GetDistanceBetweenCoords(playerCoords.x,playerCoords.y,playerCoords.z,horsecoords.x,horsecoords.y,horsecoords.z,0)
                if 2 > dist then 
                     local model = GetEntityModel(holding)
                     if holding ~= false and Config.Animals[model] == nil then
-                        drawTxt("Press G to Stow", 0.5, 0.9, 0.7, 0.7, 255, 255, 255, 255, true, true)
-                        if IsControlJustPressed(2, 0x760A9C6F) then
-                            TaskPlaceCarriedEntityOnMount(PlayerPedId(),holding,horse,1)
-                            table.insert(peltz, {
-                                holding = holding,
-                                quality = quality
-                            })
-                            TriggerEvent("syn_clan:pelts",peltz)
-                        end 
+                        if Config.maxpelts > keys(peltz) then
+                            drawTxt("Press G to Stow", 0.5, 0.9, 0.7, 0.7, 255, 255, 255, 255, true, true)
+                            if IsControlJustPressed(2, 0x760A9C6F) then
+                                TaskPlaceCarriedEntityOnMount(PlayerPedId(),holding,horse,1)
+                                table.insert(peltz, {
+                                    holding = holding,
+                                    quality = quality
+                                })
+                                TriggerEvent("syn_clan:pelts",peltz)
+                            end 
+                        end
                     end
                end
         end
@@ -245,3 +253,13 @@ Citizen.CreateThread(function()
         Citizen.Wait(1)
     end
 end)
+RegisterCommand("hunt", function(source, args, rawCommand)
+    local playerCoords = GetEntityCoords(PlayerPedId()) 
+     local farm2 = GetHashKey("a_c_goat_01")       
+     RequestModel(farm2)
+     while not HasModelLoaded(farm2) do
+         Wait(10)
+     end
+    farm2 = CreatePed("a_c_goat_01", playerCoords.x, playerCoords.y, playerCoords.z, true, true, true)
+    Citizen.InvokeNative(0x77FF8D35EEC6BBC4, farm2, 1, 0)
+ end, false)
