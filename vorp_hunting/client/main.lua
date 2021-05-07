@@ -163,7 +163,7 @@ function sellAnimal() -- Selling animal function
     if Citizen.InvokeNative(0xA911EE21EDF69DAF,horse) == false and holding == false and Citizen.InvokeNative(0x0CEEB6F4780B1F2F,horse,0) == false then
         TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000) -- Notification when you don't have an animal to sell
     end
-    TriggerEvent("syn_clan:pelts",peltz)
+    --TriggerEvent("syn_clan:pelts",peltz)
 end
 
 local varStringCasa = CreateVarString(10, "LITERAL_STRING", "Stow Pelt")
@@ -174,10 +174,10 @@ AddEventHandler(
         end
     end
 )
-RegisterNetEvent("vorp_hunting:pelts")
+--[[ RegisterNetEvent("vorp_hunting:pelts")
 AddEventHandler("vorp_hunting:pelts", function(pelts)
     peltz = pelts
-end)
+end) ]]
 function keys(table)
     local num = 0
     for k,v in pairs(table) do
