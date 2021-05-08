@@ -207,7 +207,8 @@ Citizen.CreateThread(function()
                                     holding = holding,
                                     quality = quality
                                 })
-                                TriggerEvent("syn_clan:pelts",peltz)
+                                --TriggerEvent("syn_clan:pelts",peltz)
+                                Wait(500)
                             end 
                         end
                     end
