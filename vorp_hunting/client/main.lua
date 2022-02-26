@@ -1,5 +1,6 @@
 local VORPCore = {}
 local peltz = {}
+local prompts = GetRandomIntInRange(0, 0xffffff)
 
 Citizen.CreateThread(function()
     while not VORPCore do        
@@ -13,6 +14,22 @@ end)
 RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
 AddEventHandler("vorp:SelectedCharacter", function(charid)
     startButchers()
+end)
+
+Citizen.CreateThread(function()
+    Citizen.Wait(5000)
+    local str = Config.Language.press 
+	openButcher = PromptRegisterBegin()
+	PromptSetControlAction(openButcher, Config.keys["G"])
+	str = CreateVarString(10, 'LITERAL_STRING', str)
+	PromptSetText(openButcher, str)
+	PromptSetEnabled(openButcher, 1)
+	PromptSetVisible(openButcher, 1)
+	PromptSetStandardMode(openButcher,1)
+    PromptSetHoldMode(openButcher, 1)
+	PromptSetGroup(openButcher, prompts)
+	Citizen.InvokeNative(0xC5F428EE08FA7F2C,openButcher,true)
+	PromptRegisterEnd(openButcher)
 end)
 
 function startButchers() -- Loading Butchers Function
@@ -45,17 +62,6 @@ function startButchers() -- Loading Butchers Function
     end
 end
 
-function drawTxt(text, x, y, fontscale, fontsize, r, g, b, alpha, textcentred, shadow) -- Text function
-    local str = CreateVarString(10, "LITERAL_STRING", text)
-    SetTextScale(fontscale, fontsize)
-    SetTextColor(r, g, b, alpha)
-    SetTextCentre(textcentred)
-    if shadow then 
-        SetTextDropshadow(1, 0, 0, 255)
-    end
-    SetTextFontForCurrentCommand(1)
-    DisplayText(str, x, y)
-end
 
 function sellAnimal() -- Selling animal function
     local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
@@ -63,6 +69,16 @@ function sellAnimal() -- Selling animal function
     local model = GetEntityModel(holding)
     local pedtype = GetPedType(holding)
     local horse = Citizen.InvokeNative(0x4C8B59171957BCF7,PlayerPedId())
+    local own = NetworkGetEntityOwner(holding)
+    local me = NetworkGetNetworkIdFromEntity(PlayerPedId())
+    local entityNetworkId = NetworkGetNetworkIdFromEntity(holding);
+    SetNetworkIdExistsOnAllMachines(entityNetworkId, true);
+    local entityId = NetworkGetEntityFromNetworkId(entityNetworkId);
+    if not NetworkHasControlOfEntity(entityId) then
+      NetworkRequestControlOfEntity(entityId);
+      NetworkRequestControlOfNetworkId(entityNetworkId);
+    end
+    local hasControlEntity = NetworkHasControlOfEntity(entityId);
     if horse ~= nil or horse ~= false then 
         if Citizen.InvokeNative(0xA911EE21EDF69DAF,horse) ~= false then
             local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996,horse)
@@ -174,10 +190,7 @@ AddEventHandler(
         end
     end
 )
---[[ RegisterNetEvent("vorp_hunting:pelts")
-AddEventHandler("vorp_hunting:pelts", function(pelts)
-    peltz = pelts
-end) ]]
+
 function keys(table)
     local num = 0
     for k,v in pairs(table) do
@@ -185,6 +198,7 @@ function keys(table)
     end
     return num
 end
+
 Citizen.CreateThread(function()
     while true do
         Wait(2)
@@ -200,8 +214,10 @@ Citizen.CreateThread(function()
                     local model = GetEntityModel(holding)
                     if holding ~= false and Config.Animals[model] == nil then
                         if Config.maxpelts > keys(peltz) then
-                            drawTxt("Press G to Stow", 0.5, 0.9, 0.7, 0.7, 255, 255, 255, 255, true, true)
-                            if IsControlJustPressed(2, 0x760A9C6F) then
+                            local label  = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
+                                PromptSetActiveGroupThisFrame(prompts, label)
+                            if Citizen.InvokeNative(0xC92AC953F0A982AE,openButcher) then
+                            
                                 TaskPlaceCarriedEntityOnMount(PlayerPedId(),holding,horse,1)
                                 table.insert(peltz, {
                                     holding = holding,
@@ -225,8 +241,9 @@ Citizen.CreateThread(function()
             if Vdist(playerCoords, v.coords) <= v.radius then -- Checking distance between player and butcher
                 local job
                 sleep = false
-                drawTxt(v.pressToSell, 0.5, 0.9, 0.7, 0.7, 255, 255, 255, 255, true, true)
-                if IsControlJustPressed(2, 0xD9D0E1C0) then
+                local label  = CreateVarString(10, 'LITERAL_STRING', Config.language.sell)
+                PromptSetActiveGroupThisFrame(prompts, label)
+                if Citizen.InvokeNative(0xC92AC953F0A982AE,openButcher) then
                     if Config.joblocked then 
                         TriggerEvent('vorp:ExecuteServerCallBack','vorp_hunting:getjob', function(result)  
                             job =   result
@@ -254,7 +271,25 @@ Citizen.CreateThread(function()
         Citizen.Wait(1)
     end
 end)
---[[ RegisterCommand("hunt", function(source, args, rawCommand)
+
+
+----- useful----- but anyone can use.
+RegisterCommand('animal', function(source, args, rawCommand)
+    local ped = PlayerPedId()
+    local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, ped)
+    local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
+    local model = GetEntityModel(holding)
+    local type = GetPedType(holding)
+    local hash = GetHashKey(holding)
+    print('holding',holding)
+    print('quality',quality)
+    print('model',model)
+    print('type',type)
+    print('hash',hash)
+end)
+
+
+RegisterCommand("hunt", function(source, args, rawCommand)
     local playerCoords = GetEntityCoords(PlayerPedId()) 
      local farm2 = GetHashKey("a_c_goat_01")       
      RequestModel(farm2)
@@ -263,4 +298,4 @@ end)
      end
     farm2 = CreatePed("a_c_goat_01", playerCoords.x, playerCoords.y, playerCoords.z, true, true, true)
     Citizen.InvokeNative(0x77FF8D35EEC6BBC4, farm2, 1, 0)
- end, false) ]]
+end, false) ]]
