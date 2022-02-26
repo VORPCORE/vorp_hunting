@@ -14,4 +14,4 @@
 * To change the language go to ```resources/vorp_hunting/config.lua```
 * Now you are ready!
 
-Credits to [zebbyskitzoo](https://github.com/OTRP) &amp; [CryptoGenics](https://github.com/CryptoGenics) for the original config
+Credits to [zebbyskitzoo](https://github.com/OTRP) &amp; [CryptoGenics](https://github.com/CryptoGenics) for the original config and also to [Local9](https://github.com/Local9) for potential fix.
