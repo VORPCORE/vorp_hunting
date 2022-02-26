@@ -182,7 +182,7 @@ function sellAnimal() -- Selling animal function
     --TriggerEvent("syn_clan:pelts",peltz)
 end
 
-local varStringCasa = CreateVarString(10, "LITERAL_STRING", "Stow Pelt")
+
 AddEventHandler(
     "onResourceStop",
     function(resourceName)
