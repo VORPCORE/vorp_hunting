@@ -5,7 +5,7 @@ Config.Language = {
     ["NotInTheButcher"] = "I won't buy that animal",
     ["AnimalSold"] = "Thanks for the deal!",
     ["stow"] = "Stow",
-    ["Press"] = "Press",
+    ["press"] = "Press",
     ["sell"]= "Sell",
     ["notabutcher"] = "You Dont Have The Right Job",
 }
