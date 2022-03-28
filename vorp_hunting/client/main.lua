@@ -241,7 +241,7 @@ Citizen.CreateThread(function()
             if Vdist(playerCoords, v.coords) <= v.radius then -- Checking distance between player and butcher
                 local job
                 sleep = false
-                local label  = CreateVarString(10, 'LITERAL_STRING', Config.language.sell)
+                local label  = CreateVarString(10, 'LITERAL_STRING', Config.Language.sell)
                 PromptSetActiveGroupThisFrame(prompts, label)
                 if Citizen.InvokeNative(0xC92AC953F0A982AE,openButcher) then
                     if Config.joblocked then 
@@ -289,7 +289,7 @@ RegisterCommand('animal', function(source, args, rawCommand)
 end)
 
 
-RegisterCommand("hunt", function(source, args, rawCommand)
+--[[RegisterCommand("hunt", function(source, args, rawCommand)
     local playerCoords = GetEntityCoords(PlayerPedId()) 
      local farm2 = GetHashKey("a_c_goat_01")       
      RequestModel(farm2)
@@ -298,4 +298,4 @@ RegisterCommand("hunt", function(source, args, rawCommand)
      end
     farm2 = CreatePed("a_c_goat_01", playerCoords.x, playerCoords.y, playerCoords.z, true, true, true)
     Citizen.InvokeNative(0x77FF8D35EEC6BBC4, farm2, 1, 0)
-end, false) ]]
+end, false)]]
