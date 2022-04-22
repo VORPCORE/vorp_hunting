@@ -3,13 +3,23 @@ Config = { }
 Config.Language = {
     ["NotHoldingAnimal"] = "You Got Nothing To Sell",
     ["NotInTheButcher"] = "I won't buy that animal",
-    ["AnimalSold"] = "Thanks for the deal!",
-    notabutcher = "You Dont Have The Right Job",
+    ["AnimalSold"] = "Thanks for the deal you got ",
+    ["stow"] = "Stow",
+    ["press"] = "Press",
+    ["sell"]= "Sell",
+    ["notabutcher"] = "You Dont Have The Right Job",
+    ["dollar"] = " $"
 }
 
 Config.ItemQuantity = {
     ["Max"] = 3,
     ["Min"] = 1
+}
+
+Config.keys = {
+    ["G"] = 0x760A9C6F, -- butcher sell and Stow
+    
+    
 }
 
 Config.aiButcherped = true -- spawn ai butched ped set to false if you dont want an ai butcher ped to spawn 
