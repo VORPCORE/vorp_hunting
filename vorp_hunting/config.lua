@@ -3,11 +3,12 @@ Config = { }
 Config.Language = {
     ["NotHoldingAnimal"] = "You Got Nothing To Sell",
     ["NotInTheButcher"] = "I won't buy that animal",
-    ["AnimalSold"] = "Thanks for the deal!",
+    ["AnimalSold"] = "Thanks for the deal you got ",
     ["stow"] = "Stow",
     ["press"] = "Press",
     ["sell"]= "Sell",
     ["notabutcher"] = "You Dont Have The Right Job",
+    ["dollar"] = " $"
 }
 
 Config.ItemQuantity = {
