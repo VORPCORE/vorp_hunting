@@ -19,7 +19,7 @@ AddEventHandler("vorp_hunting:giveReward", function(givenItem, money, gold, rolP
             local nmb = 0
             
             if givenAmount[k] > 0 then
-                nmb = qty
+                nmb = givenAmount[k]
             else
                 nmb = math.random(Config.ItemQuantity.Min, Config.ItemQuantity.Max)
             end
