@@ -1,8 +1,8 @@
 local VorpCore = {}
-VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
+VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 VORP = exports.vorp_core:vorpAPI()
-local VORP_API = {}
+
 
 TriggerEvent("getCore",function(core)
     VorpCore = core
@@ -44,8 +44,7 @@ end)
 
 VORP.addNewCallBack('vorp_hunting:getjob', function(source, cb)
     local _source = source
-    local User = VorpCore.getUser(source) -- Return User with functions and all characters
-    local Character = VorpCore.getUser(source).getUsedCharacter
+    local Character = VorpCore.getUser(_source).getUsedCharacter
     local job = Character.job
     cb(job)
 end)
