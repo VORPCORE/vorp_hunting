@@ -9,13 +9,22 @@ TriggerEvent("getCore",function(core)
 end)
 
 RegisterServerEvent("vorp_hunting:giveReward")
-AddEventHandler("vorp_hunting:giveReward", function(givenItem, money, gold, rolPoints, xp)
+AddEventHandler("vorp_hunting:giveReward", function(givenItem, money, gold, rolPoints, xp, givenAmount)
     local _source = source
     local Character = VorpCore.getUser(_source).getUsedCharacter
-    if givenItem ~= nil then
+    if #givenItem ~= #givenAmount then 
+        print('Error: Please ensure givenItem and givenAmount have the same length in the items config.')
+    elseif givenItem ~= nil then
         for k,v in pairs(givenItem) do 
-            local rnd = math.random(Config.ItemQuantity.Min, Config.ItemQuantity.Max)
-            VorpInv.addItem(_source, v, rnd)
+            local nmb = 0
+            
+            if givenAmount[k] > 0 then
+                nmb = qty
+            else
+                nmb = math.random(Config.ItemQuantity.Min, Config.ItemQuantity.Max)
+            end
+
+            VorpInv.addItem(_source, v, nmb)
         end
         if money ~= 0 then 
             Character.addCurrency(0, money)
