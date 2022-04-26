@@ -1,6 +1,6 @@
 # VORP-Hunting
 🐄 Selling Animals &amp; Big Fish (the ones that don't go to the inventory) script
-
+- NEW  small animals  items go to inventory when hunting them.
 ## Requirements
 - [VORP-Core](https://github.com/VORPCORE/VORP-Core/releases)
 - [VORP-Inputs](https://github.com/VORPCORE/VORP-Inputs/releases)
