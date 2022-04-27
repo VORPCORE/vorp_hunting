@@ -259,12 +259,18 @@ Citizen.CreateThread(function()
 				if event == 1376140891 then
 					local view = exports["vorp_hunting"]:DataViewNativeGetEventData(0, index, 3)
 					local pedGathered = view['2']
+                    local ped = view['0']
 					local model = GetEntityModel(pedGathered)
+
+                    -- Ensure the player who enacted the event is the one who gets the rewards
+                    local player = PlayerPedId()
+                    local playergate = player == ped
+
+                    -- print('Correct Player:', playergate)
 					
-                    print('Animal Gathered: ' ..model)
-					
-                    if model and Config.SmallAnimals[model] ~= nil then
-						local smallAnimal = Config.SmallAnimals[model]
+                    if model and Config.SmallAnimals[model] ~= nil and playergate == true then
+                        print('Animal Gathered: ' ..model)
+                        local smallAnimal = Config.SmallAnimals[model]
                         local givenItem = smallAnimal.givenItem
                         local givenAmount = smallAnimal.givenAmount
                         local money = smallAnimal.money
