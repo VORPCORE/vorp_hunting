@@ -22,20 +22,19 @@ Config.keys = {
     ["G"] = 0x760A9C6F, -- butcher sell and Stow
 }
 
-
 Config.aiButcherped = true -- spawn ai butched ped set to false if you dont want an ai butcher ped to spawn
-
 
 Config.joblocked = false -- lock the butcher so only people with the job can access. u can change access to each butcher by editing this  butcherjob = "butcher"
 
 Config.maxpelts = 2 -- max pelts allowed on back of horse
 
---RANDOMISE THE GIVE ITEM WHEN SKINNING ANIMALS OR SELLING IF YOU LEAVE IT AT 0 --------------------------
+------------------- Item Quantity Instructions -----------------
+-- The range for when a skinnableAnimal or Animal has a config value givenAmount of 0.
+-- Example: Animals with givenAmount = {0} can be sold to the butcher or be skinned, which will give the player a random number between 1 and 3 amount of givenItem
 Config.ItemQuantity = {
     ["Max"] = 3,
     ["Min"] = 1
 }
-
 
 
 Config.Butchers = {
@@ -49,17 +48,17 @@ Config.Butchers = {
     { butchername = "Tumbleweed Butcher", butcherjob = "butcher", blip = 1369919445, npcmodel = "S_M_M_UNIBUTCHERS_01", coords = vector3(-5510.371, -2947.005, -1.894515), heading = 251.54911804199, radius = 3.0 }
 }
 
--- to add more rewards on each animal edit the givenItem table. for example change givenItem ={ "meat"}, to givenItem ={ "meat","feathers"}
+-----------------ANIMAL INSTRUCTIONS  -----------------
+-- 1. To add more rewards on each animal, edit the givenItem table. For example change givenItem ={ "meat"}, to givenItem ={ "meat","feathers"}
+-- 2. If using more than one item in givenItem, then you must add another value to giveAmount. For example change givenAmount ={0}, to givenAmount ={0,0}
+-- 3. giveAmount = {0} will set a amount to random amount between ItemQuantity max/min
 
--- if using more than one item in givenItem, then you must add another value to giveAmount. for example change givenAmount ={0}, to givenAmount ={0,0}
+----------------- !IMPORTANT! -----------------
+-- TO ADD MORE ANIMALS AND FIND HASHES, HOLD ANIMALS OR PELTS AND DO /ANIMAL command
+-- YOU CAN SEE WHAT ANIMAL HASH YOU Skined/plucked/stored IN THE f6/f8 logs.
+-- THE ITEMS NAME MUST BE IN YOUR DATABASE FOR YOU TO RECEIVE THEM IN YOUR INVENTORY
 
--- giveAmount = 0 will set a amount to random amount between ItemQuantity max/min
-
-
--- TO ADD MORE ANIMALS AND FIND HASHES HOLD ANIMALS OR PELTS AND DO /ANIMAL command
--- THE ITEMS NAME MUST BE IN YOUR DATABASE
-
---  Check for Animals being skinned/plucked/stored
+-- Animals that are skinned/plucked/stored
 Config.SkinnableAnimals = {
     --small animals skin them and sell them at the butcher no need to add them to  CONFIG.ANIMALS
     [989669666]   = { name = "Rat", givenItem = { "meat" }, givenAmount = { 1 }, money = 100, gold = 0, rolPoints = 0, xp = 1 },
@@ -71,7 +70,7 @@ Config.SkinnableAnimals = {
     [-1124266369] = { name = "Bear", givenItem = { "bearHeart", "bearClaws" }, givenAmount = { 1, 3 }, money = 0, gold = 0, rolPoints = 0, xp = 1 }
 }
 
--- Animals which are traded in to the butcher
+-- Animals that are traded in to the butcher
 Config.Animals = {
     -- Animals
     [-1124266369]  = { name = "Bear", givenItem = { "meat" }, givenAmount = { 0 }, money = 100, gold = 0, rolPoints = 0, xp = 3, poorQualityMultiplier = 1.0, goodQualityMultiplier = 1.5, perfectQualityMultiplier = 2, poor = 957520252, good = 143941906, perfect = 1292673537 },
