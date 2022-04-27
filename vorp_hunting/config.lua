@@ -56,9 +56,10 @@ Config.Butchers = {
 -- giveAmount = 0 will set a amount to random amount between ItemQuantity max/min
 
 
--- TO ADD MORE ANIMALS AND FIND HASHSES HOLD ANIMALS OR PELTS AND DO /ANIMAL command
+-- TO ADD MORE ANIMALS AND FIND HASHES HOLD ANIMALS OR PELTS AND DO /ANIMAL command
 -- THE ITEMS NAME MUST BE IN YOUR DATABASE
 
+--  Check for Animals being skinned/plucked/stored
 Config.SkinnableAnimals = {
     --small animals skin them and sell them at the butcher no need to add them to  CONFIG.ANIMALS
     [989669666]   = { name = "Rat", givenItem = { "meat" }, givenAmount = { 1 }, money = 100, gold = 0, rolPoints = 0, xp = 1 },
