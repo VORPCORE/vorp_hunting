@@ -248,7 +248,7 @@ Citizen.CreateThread(function()
     end
  end)
 
---  Check for Small Animals being skinned/plucked/stored
+--  Check for Animals being skinned/plucked/stored
  Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(2)
@@ -268,15 +268,15 @@ Citizen.CreateThread(function()
 
                     -- print('Correct Player:', playergate)
 					
-                    if model and Config.SmallAnimals[model] ~= nil and playergate == true then
+                    if model and Config.SkinnableAnimals[model] ~= nil and playergate == true then
                         print('Animal Gathered: ' ..model)
-                        local smallAnimal = Config.SmallAnimals[model]
-                        local givenItem = smallAnimal.givenItem
-                        local givenAmount = smallAnimal.givenAmount
-                        local money = smallAnimal.money
-                        local gold = smallAnimal.gold
-                        local rolPoints = smallAnimal.rolPoints
-                        local xp = smallAnimal.xp               
+                        local skinAnimal = Config.SkinnableAnimals[model]
+                        local givenItem = skinAnimal.givenItem
+                        local givenAmount = skinAnimal.givenAmount
+                        local money = skinAnimal.money
+                        local gold = skinAnimal.gold
+                        local rolPoints = skinAnimal.rolPoints
+                        local xp = skinAnimal.xp               
                         
                         local output = ''
                         -- Check array length of items
@@ -293,7 +293,7 @@ Citizen.CreateThread(function()
                         TriggerServerEvent("vorp_hunting:giveReward", givenItem, money, gold, rolPoints, xp, givenAmount) 
 
                         -- Alert item was added
-                        TriggerEvent("vorp:TipRight", Config.Language.SmallAnimalStowed..output, 4000)
+                        TriggerEvent("vorp:TipRight", Config.Language.SkinnableAnimalstowed..output, 4000)
 					end
 				end
 			end

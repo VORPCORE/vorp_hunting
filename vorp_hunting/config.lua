@@ -8,7 +8,7 @@ Config.Language = {
     NotHoldingAnimal = "You Got Nothing To Sell",
     NotInTheButcher = "I won't buy that animal",
     AnimalSold = "Thanks for the deal you got ",
-    SmallAnimalStowed = "You obtained ",
+    SkinnableAnimalstowed = "You obtained ",
     stow = "Stow",
     press = "Press",
     sell = "Sell",
@@ -59,7 +59,7 @@ Config.Butchers = {
 -- TO ADD MORE ANIMALS AND FIND HASHSES HOLD ANIMALS OR PELTS AND DO /ANIMAL command
 -- THE ITEMS NAME MUST BE IN YOUR DATABASE
 
-Config.SmallAnimals = {
+Config.SkinnableAnimals = {
     --small animals skin them and sell them at the butcher no need to add them to  CONFIG.ANIMALS
     [989669666]   = { name = "Rat", givenItem = { "meat" }, givenAmount = { 1 }, money = 100, gold = 0, rolPoints = 0, xp = 1 },
     [1458540991]  = { name = "Raccoon", givenItem = { "pelt" }, givenAmount = { 2 }, money = 100, gold = 0, rolPoints = 0, xp = 1 },
@@ -70,6 +70,7 @@ Config.SmallAnimals = {
     [-1124266369] = { name = "Bear", givenItem = { "bearHeart", "bearClaws" }, givenAmount = { 1, 3 }, money = 0, gold = 0, rolPoints = 0, xp = 1 }
 }
 
+-- Animals which are traded in to the butcher
 Config.Animals = {
     -- Animals
     [-1124266369]  = { name = "Bear", givenItem = { "meat" }, givenAmount = { 0 }, money = 100, gold = 0, rolPoints = 0, xp = 3, poorQualityMultiplier = 1.0, goodQualityMultiplier = 1.5, perfectQualityMultiplier = 2, poor = 957520252, good = 143941906, perfect = 1292673537 },
