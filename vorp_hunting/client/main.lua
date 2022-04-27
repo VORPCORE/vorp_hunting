@@ -259,11 +259,18 @@ Citizen.CreateThread(function()
 				if event == 1376140891 then
 					local view = exports["vorp_hunting"]:DataViewNativeGetEventData(0, index, 3)
 					local pedGathered = view['2']
+                    local ped = view['0']
 					local model = GetEntityModel(pedGathered)
-					
+
+                    -- Potential fix; however just a theory and still needs to be tested.
+                    -- NOT TESTED YET
+                    local player = PlayerPedId()
+                    local playergate = player == ped
+
                     print('Animal Gathered: ' ..model)
+                    -- print('Player Gated:', playergate)
 					
-                    if model and Config.SmallAnimals[model] ~= nil then
+                    if model and Config.SmallAnimals[model] ~= nil and playergate == true then
 						local smallAnimal = Config.SmallAnimals[model]
                         local givenItem = smallAnimal.givenItem
                         local givenAmount = smallAnimal.givenAmount
