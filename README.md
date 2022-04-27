@@ -1,6 +1,12 @@
 # VORP-Hunting
-🐄 Selling Animals &amp; Big Fish (the ones that don't go to the inventory) script
-- NEW  small animals  items go to inventory when hunting them.
+- hunt animals and sell 
+- sell big fish
+- whole animals
+- carcasses
+- pelts
+- pelts stored on the back of the horses
+- NEW  you can get items to inventory when skinning them.
+
 ## Requirements
 - [VORP-Core](https://github.com/VORPCORE/VORP-Core/releases)
 - [VORP-Inputs](https://github.com/VORPCORE/VORP-Inputs/releases)
