@@ -262,16 +262,15 @@ Citizen.CreateThread(function()
                     local ped = view['0']
 					local model = GetEntityModel(pedGathered)
 
-                    -- Potential fix; however just a theory and still needs to be tested.
-                    -- NOT TESTED YET
+                    -- Ensure the player who enacted the event is the one who gets the rewards
                     local player = PlayerPedId()
                     local playergate = player == ped
 
-                    print('Animal Gathered: ' ..model)
-                    -- print('Player Gated:', playergate)
+                    -- print('Correct Player:', playergate)
 					
                     if model and Config.SmallAnimals[model] ~= nil and playergate == true then
-						local smallAnimal = Config.SmallAnimals[model]
+                        print('Animal Gathered: ' ..model)
+                        local smallAnimal = Config.SmallAnimals[model]
                         local givenItem = smallAnimal.givenItem
                         local givenAmount = smallAnimal.givenAmount
                         local money = smallAnimal.money
