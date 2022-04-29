@@ -261,14 +261,15 @@ Citizen.CreateThread(function()
 					local pedGathered = view['2']
                     local ped = view['0']
 					local model = GetEntityModel(pedGathered)
+                    
+                    -- Bool to let you know if animation/longpress was enacted.
+                    local bool_unk = view['4']
 
                     -- Ensure the player who enacted the event is the one who gets the rewards
                     local player = PlayerPedId()
                     local playergate = player == ped
-
-                    -- print('Correct Player:', playergate)
 					
-                    if model and Config.SmallAnimals[model] ~= nil and playergate == true then
+                    if model and Config.SmallAnimals[model] ~= nil and playergate == true and bool_unk == 1  then
                         print('Animal Gathered: ' ..model)
                         local smallAnimal = Config.SmallAnimals[model]
                         local givenItem = smallAnimal.givenItem
