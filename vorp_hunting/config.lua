@@ -3,6 +3,8 @@
 
 Config = {}
 
+Config.DevMode = true -- DIABLE THIS IF YOUR SERVER IS LIVE
+
 ----------------------------- TRANSLATE HERE -------------------------------------
 Config.Language = {
     NotHoldingAnimal = "You Got Nothing To Sell",
@@ -19,7 +21,7 @@ Config.Language = {
 
 ------------------- PROMPT -----------------
 Config.keys = {
-    ["G"] = 0x760A9C6F, -- butcher sell and Stow
+    G = 0x760A9C6F, -- butcher sell and Stow
 }
 
 Config.aiButcherped = true -- spawn ai butched ped set to false if you dont want an ai butcher ped to spawn
@@ -32,8 +34,8 @@ Config.maxpelts = 2 -- max pelts allowed on back of horse
 -- The range for when a skinnableAnimal or Animal has a config value givenAmount of 0.
 -- Example: Animals with givenAmount = {0} can be sold to the butcher or be skinned, which will give the player a random number between 1 and 3 amount of givenItem
 Config.ItemQuantity = {
-    ["Max"] = 3,
-    ["Min"] = 1
+    Max = 3,
+    Min = 1
 }
 
 
