@@ -15,7 +15,8 @@ Config.Language = {
     press = "Press",
     sell = "Sell",
     notabutcher = "You Dont Have The Right Job",
-    dollar = " $"
+    dollar = " $",
+    join = " and "
 }
 
 
@@ -65,9 +66,9 @@ Config.SkinnableAnimals = {
     --small animals skin them and sell them at the butcher no need to add them to  CONFIG.ANIMALS
     [989669666]   = { name = "Rat", givenItem = { "meat" }, givenAmount = { 1 }, givenDisplay = {}, money = 100, gold = 0, rolPoints = 0, xp = 1 },
     [1458540991]  = { name = "Raccoon", givenItem = { "pelt" }, givenAmount = { 2 }, givenDisplay = {}, money = 100, gold = 0, rolPoints = 0, xp = 1 },
-    [-1003616053] = { name = "Duck", givenItem = { "feathers", "meat" }, givenAmount = { 0, 1 }, givenDisplay = {}, money = 100, gold = 0, rolPoints = 0, xp = 1 },
+    [-1003616053] = { name = "Duck", givenItem = { "feathers" }, givenAmount = { 0, 1 }, givenDisplay = {}, money = 100, gold = 0, rolPoints = 0, xp = 1 },
 
-    -- big animals when you skin them it gives you items. if you 0have it added TO CONFIG.ANIMALS JUST COPY PASTE HERE AND REMOVE THE GIVE MONEY ETC LIKE SHOWN BELOW.
+    -- big animals when you skin them it gives you items. if you have it added TO CONFIG.ANIMALS JUST COPY PASTE HERE AND REMOVE THE GIVE MONEY ETC LIKE SHOWN BELOW.
     [1110710183]  = { name = "Deer", givenItem = { "meat" }, givenAmount = { 0 }, givenDisplay = {}, money = 0, gold = 0, rolPoints = 0, xp = 1 },
     [-1124266369] = { name = "Bear", givenItem = { "bearHeart", "bearClaws" }, givenAmount = { 1, 3 }, givenDisplay = { "Heart", "Claw"}, money = 0, gold = 0, rolPoints = 0, xp = 1 },
 }

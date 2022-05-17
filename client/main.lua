@@ -282,7 +282,7 @@ Citizen.CreateThread(function()
                         if #givenDisplay > 0 and #givenAmount >= 0 then
                             for i, v in ipairs(givenDisplay) do
                                 if i > 1 then 
-                                    output = output.. ' and '
+                                    output = output.. Config.Language.join
                                 end
 
                                 if givenAmount[i] > 1 then
