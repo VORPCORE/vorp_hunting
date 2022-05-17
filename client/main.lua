@@ -44,6 +44,43 @@ function StartButchers() -- Loading Butchers Function
     end
 end
 
+function awardQuality(quality, cb)
+    local skinFound = false
+    for k, v in pairs(Config.Animals) do
+        local givenItem = v.givenItem
+        local money = v.money
+        local gold = v.gold
+        local rolPoints = v.rolPoints
+        local xp = v.xp
+        local givenAmount = v.givenAmount
+        if quality == v.perfect then -- Checking perfect quality
+            local multiplier = v.perfectQualityMultiplier
+            local moneten = money * multiplier
+            TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
+            TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
+            skinFound = true
+        elseif quality == v.good then -- Checking good quality
+            local multiplier = v.goodQualityMultiplier
+            local moneten = money * multiplier
+            TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
+            TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
+            skinFound = true
+        elseif quality == v.poor then -- Checking poor quality
+            local multiplier = v.poorQualityMultiplier
+            local moneten = money * multiplier
+            TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
+            TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
+            skinFound = true
+        end
+    end
+
+    if not skinFound then
+        -- TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000) -- Notification when the animal isn't being sold in the butcher 
+    else
+        cb()
+    end
+end
+
 function SellAnimal() -- Selling animal function
     local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
     local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
@@ -52,16 +89,23 @@ function SellAnimal() -- Selling animal function
     local entityNetworkId = NetworkGetNetworkIdFromEntity(holding)
     SetNetworkIdExistsOnAllMachines(entityNetworkId, true)
     local entityId = NetworkGetEntityFromNetworkId(entityNetworkId)
+    
     if not NetworkHasControlOfEntity(entityId) then
         NetworkRequestControlOfEntity(entityId)
         NetworkRequestControlOfNetworkId(entityNetworkId)
     end
 
+    local alreadysoldanimal = false
+
+    -- Logic for if a horse is detected
     if horse ~= nil or horse ~= false then
+        -- Check if the horse is holding anything
         if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) ~= false then
-            local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse)
+            local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse) -- Get what the horse is holding
             local model2 = GetEntityModel(holding2)
-            if Config.Animals[model2] ~= nil then -- Paying for animals
+
+            local quality2 = Citizen.InvokeNative(0x31FEF6A20F00B963, holding2)
+            if Config.Animals[model2] ~= nil then -- Fallback for paying for non pelts
                 local animal = Config.Animals[model2]
                 local givenItem = animal.givenItem
                 local money = animal.money
@@ -69,54 +113,34 @@ function SellAnimal() -- Selling animal function
                 local rolPoints = animal.rolPoints
                 local xp = animal.xp
                 local givenAmount = animal.givenAmount
+                alreadysoldanimal = true
                 TriggerServerEvent("vorp_hunting:giveReward", givenItem, money, gold, rolPoints, xp, givenAmount)
                 TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. money .. Config.Language.dollar, 4000) -- Sold notification
                 DeleteEntity(holding2)
-                Citizen.InvokeNative(0x5E94EA09E7207C16, holding2)
+                Citizen.InvokeNative(0x5E94EA09E7207C16, holding2) --Delete Entity
                 DeletePed(holding2)
+            elseif (quality2 ~= false and quality2 ~= nil) then --Award pelt if pelt is on horse
+                awardQuality(quality2, function () 
+                    alreadysoldanimal = true
+                    DeleteEntity(holding2)
+                    Citizen.InvokeNative(0x5E94EA09E7207C16, holding2) --Delete Entity
+                    DeletePed(holding2)
+                end)
             end
-        end
-        if Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) ~= false then
+        elseif Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) ~= false then
+            local q = Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0)
             for x, y in pairs(peltz) do
-                local pelt = Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0)
-                local skinFound = false
-                for k, v in pairs(Config.Animals) do
-                    local givenItem = v.givenItem
-                    local money = v.money
-                    local gold = v.gold
-                    local rolPoints = v.rolPoints
-                    local xp = v.xp
-                    local givenAmount = v.givenAmount
-                    if y.quality == v.perfect then -- Checking perfect quality
-                        local multiplier = v.perfectQualityMultiplier
-                        local moneten = money * multiplier
-                        TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
-                        TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
-                        skinFound = true
-                    elseif y.quality == v.good then -- Checking good quality
-                        local multiplier = v.goodQualityMultiplier
-                        local moneten = money * multiplier
-                        TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
-                        TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
-                        skinFound = true
-                    elseif y.quality == v.poor then -- Checking poor quality
-                        local multiplier = v.poorQualityMultiplier
-                        local moneten = money * multiplier
-                        TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
-                        TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
-                        skinFound = true
-                    end
-                end
-                if not skinFound then
-                    TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000) -- Notification when the animal isn't being sold in the butcher 
-                else
-                    Citizen.InvokeNative(0x627F7F3A0C4C51FF, horse, pelt)
-                end
+                awardQuality(q, function () 
+                    alreadysoldanimal = true
+                    Citizen.InvokeNative(0x627F7F3A0C4C51FF, horse, q)
+                end)
+
                 table.remove(peltz, x)
             end
         end
     end
-    if holding ~= false then -- Checking if you are holding an animal
+    
+    if holding ~= false and alreadysoldanimal == false then -- Checking if you are holding an animal
         if Config.Animals[model] ~= nil then -- Paying for animals
             local animal = Config.Animals[model]
             local givenItem = animal.givenItem
@@ -125,53 +149,30 @@ function SellAnimal() -- Selling animal function
             local rolPoints = animal.rolPoints
             local xp = animal.xp
             local givenAmount = animal.givenAmount
+            alreadysoldanimal = true
             TriggerServerEvent("vorp_hunting:giveReward", givenItem, money, gold, rolPoints, xp, givenAmount)
             TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. money .. Config.Language.dollar, 4000) -- Sold notification
             DeleteEntity(holding)
             Citizen.InvokeNative(0x5E94EA09E7207C16, holding)
             DeletePed(holding)
         else -- Paying for skins
-            local skinFound = false
-            for k, v in pairs(Config.Animals) do
-                local givenItem = v.givenItem
-                local money = v.money
-                local gold = v.gold
-                local rolPoints = v.rolPoints
-                local xp = v.xp
-                local givenAmount = v.givenAmount
-                if quality == v.perfect then -- Checking perfect quality
-                    local multiplier = v.perfectQualityMultiplier
-                    local moneten = money * multiplier
-                    TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
-                    TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
-                    skinFound = true
-                elseif quality == v.good then -- Checking good quality
-                    local multiplier = v.goodQualityMultiplier
-                    local moneten = money * multiplier
-                    TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
-                    TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
-                    skinFound = true
-                elseif quality == v.poor then -- Checking poor quality
-                    local multiplier = v.poorQualityMultiplier
-                    local moneten = money * multiplier
-                    TriggerServerEvent("vorp_hunting:giveReward", givenItem, money * multiplier, gold * multiplier, rolPoints * multiplier, xp * multiplier, givenAmount)
-                    TriggerEvent("vorp:TipRight", Config.Language.AnimalSold .. moneten .. Config.Language.dollar, 4000)
-                    skinFound = true
-                end
-            end
-            if not skinFound then
-                TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000) -- Notification when the animal isn't being sold in the butcher 
-            else
+            awardQuality(quality, function ()
+                alreadysoldanimal = true
                 DeleteEntity(holding)
                 Citizen.InvokeNative(0x5E94EA09E7207C16, holding)
                 DeletePed(holding)
-
-            end
+            end)
         end
     end
-    if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) == false and holding == false and Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) == false then
-        TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000) -- Notification when you don't have an animal to sell
+
+    if (alreadysoldanimal == false) then
+        if holding == false then
+            TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000)
+        else
+            TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000)
+        end
     end
+
     --TriggerEvent("syn_clan:pelts",peltz)
 end
 
@@ -405,5 +406,3 @@ RegisterCommand("hunt", function(source, args, rawCommand)
         FreezeEntityPosition(animal,true)
     end
 end, false)
-
-
