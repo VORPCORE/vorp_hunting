@@ -268,10 +268,11 @@ Citizen.CreateThread(function()
                     local player = PlayerPedId()
                     local playergate = player == ped
 
-                    if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
-
+                    if model then
                         print('Animal Gathered: ' .. model) --remove this if you want
-
+                    end
+                    
+                    if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
                         local skinAnimal = Config.SkinnableAnimals[model]
                         local givenItem = skinAnimal.givenItem
                         local givenAmount = skinAnimal.givenAmount

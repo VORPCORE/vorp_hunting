@@ -55,14 +55,14 @@ AddEventHandler("vorp_hunting:giveReward", function(givenItem, money, gold, rolP
         end
 
         if itemsAvailable == false then
-            TriggerClientEvent("vorp:TipRight", _source, 'Inventory is too full to sell this animal', 4000)
+            TriggerClientEvent("vorp:TipRight", _source,  Config.FullInventory, 4000)
             return
         end
 
         -- Check if there is enough room in inventory in general.
         local invAvailable = VorpInv.canCarryItems(_source, total)
         if invAvailable ~= true then
-            TriggerClientEvent("vorp:TipRight", _source, 'Inventory is too full to sell this animal', 4000)
+            TriggerClientEvent("vorp:TipRight", _source, Config.FullInventory, 4000)
             return
         end
 

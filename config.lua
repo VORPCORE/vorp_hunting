@@ -16,7 +16,8 @@ Config.Language = {
     sell = "Sell",
     notabutcher = "You Dont Have The Right Job",
     dollar = " $",
-    join = " and "
+    join = " and ",
+    FullInventory = "Inventory is too full."
 }
 
 
