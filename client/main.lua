@@ -142,14 +142,17 @@ function SellAnimal() -- Selling animal function
     
         local model = GetEntityModel(holding)
         
-        local entityNetworkId = NetworkGetNetworkIdFromEntity(holding)
-        SetNetworkIdExistsOnAllMachines(entityNetworkId, true)
-        local entityId = NetworkGetEntityFromNetworkId(entityNetworkId)
-        
-        if not NetworkHasControlOfEntity(entityId) then
-            NetworkRequestControlOfEntity(entityId)
-            NetworkRequestControlOfNetworkId(entityNetworkId)
+        if holding ~= nil then
+            local entityNetworkId = NetworkGetNetworkIdFromEntity(holding)
+            SetNetworkIdExistsOnAllMachines(entityNetworkId, true)
+            local entityId = NetworkGetEntityFromNetworkId(entityNetworkId)
+            
+            if not NetworkHasControlOfEntity(entityId) then
+                NetworkRequestControlOfEntity(entityId)
+                NetworkRequestControlOfNetworkId(entityNetworkId)
+            end
         end
+
         if Config.Animals[model] ~= nil then -- Paying for animals
             local animal = Config.Animals[model]
             local givenItem = animal.givenItem
