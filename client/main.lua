@@ -82,23 +82,10 @@ function awardQuality(quality, cb)
 end
 
 function SellAnimal() -- Selling animal function
-    local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
-    local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
-    local model = GetEntityModel(holding)
     local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, PlayerPedId())
-    local entityNetworkId = NetworkGetNetworkIdFromEntity(holding)
-    SetNetworkIdExistsOnAllMachines(entityNetworkId, true)
-    local entityId = NetworkGetEntityFromNetworkId(entityNetworkId)
-    
-    if not NetworkHasControlOfEntity(entityId) then
-        NetworkRequestControlOfEntity(entityId)
-        NetworkRequestControlOfNetworkId(entityNetworkId)
-    end
-
     local alreadysoldanimal = false
-
     -- Logic for if a horse is detected
-    if horse ~= nil or horse ~= false then
+    if horse ~= nil and horse ~= false then
         -- Check if the horse is holding anything
         if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) ~= false then
             local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse) -- Get what the horse is holding
@@ -139,8 +126,21 @@ function SellAnimal() -- Selling animal function
             end
         end
     end
-    
+
+    local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
     if holding ~= false and alreadysoldanimal == false then -- Checking if you are holding an animal
+        local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
+    
+        local model = GetEntityModel(holding)
+        
+        local entityNetworkId = NetworkGetNetworkIdFromEntity(holding)
+        SetNetworkIdExistsOnAllMachines(entityNetworkId, true)
+        local entityId = NetworkGetEntityFromNetworkId(entityNetworkId)
+        
+        if not NetworkHasControlOfEntity(entityId) then
+            NetworkRequestControlOfEntity(entityId)
+            NetworkRequestControlOfNetworkId(entityNetworkId)
+        end
         if Config.Animals[model] ~= nil then -- Paying for animals
             local animal = Config.Animals[model]
             local givenItem = animal.givenItem
@@ -406,3 +406,5 @@ RegisterCommand("hunt", function(source, args, rawCommand)
         FreezeEntityPosition(animal,true)
     end
 end, false)
+
+
