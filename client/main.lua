@@ -271,7 +271,7 @@ Citizen.CreateThread(function()
                     local player = PlayerPedId()
                     local playergate = player == ped
 
-                    if model then
+                    if model and playergate == true then
                         print('Animal Gathered: ' .. model) --remove this if you want
                     end
                     

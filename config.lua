@@ -162,6 +162,4 @@ Config.Animals = {
     [2410477101]   = { name = "Smallmouth bass", givenItem = { "fish" }, givenAmount = { 0 }, money = 2, gold = 0, rolPoints = 0, xp = 3, poorQualityMultiplier = 1.0, goodQualityMultiplier = 1.5, perfectQualityMultiplier = 2, poor = nil, good = nil, perfect = nil },
     [543892122]    = { name = "Salmon Redfish", givenItem = { "fish" }, givenAmount = { 0 }, money = 2, gold = 0, rolPoints = 0, xp = 3, poorQualityMultiplier = 1.0, goodQualityMultiplier = 1.5, perfectQualityMultiplier = 2, poor = nil, good = nil, perfect = nil },
     [1702636991]   = { name = "Salmon sockeye", givenItem = { "fish" }, givenAmount = { 0 }, money = 2, gold = 0, rolPoints = 0, xp = 3, poorQualityMultiplier = 1.0, goodQualityMultiplier = 1.5, perfectQualityMultiplier = 2, poor = nil, good = nil, perfect = nil },
-
-
 }
