@@ -11,7 +11,7 @@ local function giveReward(context, data, skipfinal)
     local Character = VorpCore.getUser(_source).getUsedCharacter
 	
 	local money, gold, rolPoints, xp = 0,0,0,0
-	local givenItem, givenAmount, givenDisplay
+	local givenItem, givenAmount, givenDisplay = {},{},{}
 	local animal, found
 	if context == "skinned" then
 		animal = Config.SkinnableAnimals[data.model]
