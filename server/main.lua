@@ -97,7 +97,7 @@ local function giveReward(context, data, skipfinal)
 		
 		if #givenItem ~= #givenAmount then
 			print('Error: Please ensure givenItem and givenAmount have the same length in the items config.')
-		elseif givenItem ~= nil then
+		elseif (givenItem ~= nil) and (#givenItem > 0) then
 			local formattedGivenItems = {}
 			local total = 0
 
