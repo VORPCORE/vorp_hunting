@@ -149,7 +149,7 @@ local function giveReward(context, data, skipfinal)
 			local validDisplays = #givenItem == #givenDisplay
 			local givenMsg = ""
 			if #formattedGivenItems > 0 then
-				if context == skinned then
+				if context == "skinned" then
 					givenMsg = Config.Language.SkinnableAnimalstowed
 				else
 					givenMsg = "You received "
