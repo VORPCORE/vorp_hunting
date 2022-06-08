@@ -104,13 +104,17 @@ local function giveReward(context, data, skipfinal)
 			-- Format items and set random quantities if set.
 			-- Check if items can be added
 			-- total up the quantity so it can be checked as a whole
-			for k, v in pairs(givenItem) do
+			for k, v in ipairs(givenItem) do
 				local nmb = 0
-
-				if givenAmount[k] > 0 then
-					nmb = givenAmount[k]
+				
+				if type(givenAmount[k]) == "table" then
+					nbm = math.random(tonumber(givenAmount[k][1]) or 0, tonumber(givenAmount[k][2]) or 1)
 				else
-					nmb = math.random(Config.ItemQuantity.Min, Config.ItemQuantity.Max)
+					if givenAmount[k] > 0 then
+						nmb = givenAmount[k]
+					else
+						nmb = math.random(Config.ItemQuantity.Min, Config.ItemQuantity.Max)
+					end
 				end
 
 				formattedGivenItems[k] = {
