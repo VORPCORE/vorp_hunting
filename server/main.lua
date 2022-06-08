@@ -108,7 +108,7 @@ local function giveReward(context, data, skipfinal)
 				local nmb = 0
 				
 				if type(givenAmount[k]) == "table" then
-					nbm = math.random(tonumber(givenAmount[k][1]) or 0, tonumber(givenAmount[k][2]) or 1)
+					nmb = math.random(tonumber(givenAmount[k][1]) or 0, tonumber(givenAmount[k][2]) or 1)
 				else
 					if givenAmount[k] > 0 then
 						nmb = givenAmount[k]
