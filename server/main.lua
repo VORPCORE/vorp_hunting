@@ -35,11 +35,11 @@ local function giveReward(context, data, skipfinal)
 			xp = animal.xp or 0
 			
 			local multiplier = 1.0
-			if animal.poorQualityMultiplier and (data.quality == animal.poorQualityMultiplier) then
+			if (animal.poorQualityMultiplier and animal.poor) and (data.quality == animal.poor) then
 				multiplier = animal.poorQualityMultiplier
-			elseif animal.goodQualityMultiplier and (data.quality == animal.goodQualityMultiplier) then
+			elseif (animal.goodQualityMultiplier and animal.good) and (data.quality == animal.good) then
 				multiplier = animal.goodQualityMultiplier
-			elseif animal.perfectQualityMultiplier and (data.quality == animal.perfectQualityMultiplier) then
+			elseif (animal.perfectQualityMultiplier and animal.perfect) and (data.quality == animal.perfect) then
 				multiplier = animal.perfectQualityMultiplier
 			end
 			
