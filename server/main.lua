@@ -183,7 +183,7 @@ AddEventHandler("vorp_hunting:giveReward", giveReward)
 
 
 RegisterServerEvent("vorp_hunting:getJob")
-AddEventHandler("vorp_hunting:getJob", function(source)
+AddEventHandler("vorp_hunting:getJob", function()
     local _source = source
     local User = VorpCore.getUser(_source)
     local Character = User.getUsedCharacter
@@ -192,3 +192,4 @@ AddEventHandler("vorp_hunting:getJob", function(source)
     TriggerClientEvent("vorp_hunting:findJob", _source, job)
 
 end)
+
