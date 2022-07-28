@@ -4,7 +4,7 @@
 Config = {}
 
 Config.DevMode = true -- DIABLE THIS IF YOUR SERVER IS LIVE
-
+Config.butcherfunction = true -- set to true if you want to use butcher functions
 ----------------------------- TRANSLATE HERE -------------------------------------
 Config.Language = {
     NotHoldingAnimal = "You Got Nothing To Sell",
