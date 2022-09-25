@@ -3,7 +3,10 @@
 
 Config = {}
 
-Config.DevMode = true -- DIABLE THIS IF YOUR SERVER IS LIVE
+Config.DevMode = false -- DIABLE THIS IF YOUR SERVER IS LIVE
+
+Config.Linux = false -- If they use a Linux server, then true
+
 Config.butcherfunction = true -- set to true if you want to use butcher functions
 ----------------------------- TRANSLATE HERE -------------------------------------
 Config.Language = {
