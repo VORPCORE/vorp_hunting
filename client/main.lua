@@ -84,7 +84,7 @@ function SellAnimal() -- Selling animal function
     local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, PlayerPedId())
     local alreadysoldanimal = false
     -- Logic for if a horse is detected
-    if horse ~= nil and horse ~= false then
+    if horse ~= nil and horse ~= false and NetworkGetEntityOwner(horse) == PlayerId() then
         -- Check if the horse is holding anything
         if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) ~= false then
             local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse) -- Get what the horse is holding
