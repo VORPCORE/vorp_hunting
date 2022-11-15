@@ -199,12 +199,16 @@ Citizen.CreateThread(function()
             if 2 > dist then
                 local model = GetEntityModel(holding)
                 if holding ~= false and Config.Animals[model] == nil then
-                    if Config.maxpelts > Keys(peltz) then
 
+                    local maxpelts = Config.maxpelts
+                    if Config.maxpelts > 3 then --Limit max pelts to 3 as thats what red dead allows on a horse
+                        maxpelts = 3
+                    end
+
+                    if maxpelts > Keys(peltz) then
                         local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
                         PromptSetActiveGroupThisFrame(prompts, label)
                         if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
-
                             TaskPlaceCarriedEntityOnMount(player, holding, horse, 1)
                             table.insert(peltz, {
                                 holding = holding,
