@@ -34,7 +34,7 @@ end)
 function StartButchers() -- Loading Butchers Function
     for i, v in ipairs(Config.Butchers) do
         local x, y, z = table.unpack(v.coords)
-        if Config.aiButcherped then
+        if v.butcherped then
             -- Loading Model
             local hashModel = GetHashKey(v.npcmodel)
             if IsModelValid(hashModel) then
