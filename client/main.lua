@@ -1,7 +1,11 @@
 local peltz = {}
 local prompts = GetRandomIntInRange(0, 0xffffff)
 local playerJob
+local VORPcore = {}
 
+TriggerEvent("getCore", function(core)
+    VORPcore = core
+end )
 
 RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
 AddEventHandler("vorp:SelectedCharacter", function(charid)
@@ -251,6 +255,7 @@ Citizen.CreateThread(function()
                     
                     if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
                         TriggerServerEvent("vorp_hunting:giveReward", "skinned", {model=model}, true)
+			VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
                     end
                 end
             end
