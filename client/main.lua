@@ -38,7 +38,7 @@ end)
 function StartButchers() -- Loading Butchers Function
     for i, v in ipairs(Config.Butchers) do
         local x, y, z = table.unpack(v.coords)
-        if v.butcherped then
+        if Config.aiButcherped == true then
             -- Loading Model
             local hashModel = GetHashKey(v.npcmodel)
             if IsModelValid(hashModel) then
@@ -59,10 +59,10 @@ function StartButchers() -- Loading Butchers Function
             FreezeEntityPosition(npc, true) -- NPC can't escape
             SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
         end
-        if v.showblip then
-        local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
-        SetBlipSprite(blip, v.blip, true) -- Blip Texture
-        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
+        if v.blip ~= 0 then
+        	local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
+        	SetBlipSprite(blip, v.blip, true) -- Blip Texture
+        	Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
         end
     end
 end
