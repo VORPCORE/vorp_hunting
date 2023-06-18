@@ -255,7 +255,7 @@ Citizen.CreateThread(function()
                     
                     if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
                         TriggerServerEvent("vorp_hunting:giveReward", "skinned", {model=model}, true)
-			VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
+			--VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
                     end
                 end
             end
