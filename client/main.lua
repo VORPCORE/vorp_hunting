@@ -188,6 +188,7 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
+    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true) 
     while true do
         Wait(2)
         local player = PlayerPedId()
