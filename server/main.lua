@@ -1,9 +1,7 @@
 local VorpCore = {}
-
 TriggerEvent("getCore", function(core)
     VorpCore = core
 end)
-
 VorpInv = exports.vorp_inventory:vorp_inventoryApi()
 
 local function giveReward(context, data, skipfinal)
@@ -33,7 +31,7 @@ local function giveReward(context, data, skipfinal)
 			gold = animal.gold or 0
 			rolPoints = animal.rolPoints or 0
 			xp = animal.xp or 0
-			
+
 			local multiplier = 1.0
 			if (animal.poorQualityMultiplier and animal.poor) and (data.quality == animal.poor) then
 				multiplier = animal.poorQualityMultiplier
@@ -42,7 +40,7 @@ local function giveReward(context, data, skipfinal)
 			elseif (animal.perfectQualityMultiplier and animal.perfect) and (data.quality == animal.perfect) then
 				multiplier = animal.perfectQualityMultiplier
 			end
-			
+
 			money = money * multiplier
 			gold = gold * multiplier
 			rolPoints = rolPoints * multiplier
@@ -65,7 +63,7 @@ local function giveReward(context, data, skipfinal)
 	if found then
 		local monies = {}
 		local moneylinux = (math.floor(money * 100) / 100)
-		if Config.Linux == true then
+		if Config.Linux then
 			if money ~= 0 then
 				table.insert(monies, Config.Language.dollar .. moneylinux)
 				Character.addCurrency(0, money)
@@ -99,14 +97,12 @@ local function giveReward(context, data, skipfinal)
 			TriggerClientEvent("vorp_hunting:finalizeReward", _source, data.entity, data.horse)
 		end
 		
-		local itemsAvailable = true 
-		local done = false
-		
+		local itemsAvailable, done = true, false
+
 		if #givenItem ~= #givenAmount then
 			print('Error: Please ensure givenItem and givenAmount have the same length in the items config.')
-		elseif (givenItem ~= nil) and (#givenItem > 0) then
-			local formattedGivenItems = {}
-			local total = 0
+		elseif givenItem ~= nil and #givenItem > 0 then
+			local formattedGivenItems, total = {}, 0
 
 			-- Format items and set random quantities if set.
 			-- Check if items can be added
@@ -132,28 +128,26 @@ local function giveReward(context, data, skipfinal)
 				total = total + nmb
 
 				-- Check if there is enough to add, if not send message
-				TriggerEvent("vorpCore:canCarryItem", tonumber(_source), v, nmb, function(canCarryItem)                
+				TriggerEvent("vorpCore:canCarryItem", tonumber(_source), v, nmb, function(canCarryItem)
 					if canCarryItem ~= true then
-						itemsAvailable = false              
+						itemsAvailable = false
 					end
 					done = true
 				end)
 
-				while done == false do
+				while not done do
 					Wait(500)
 				end
 			end
 
-			if itemsAvailable == false then
-				TriggerClientEvent("vorp:TipRight", _source,  Config.Language.FullInventory, 4000)
-				return
+			if not itemsAvailable then
+				TriggerClientEvent("vorp:TipRight", _source,  Config.Language.FullInventory, 4000) return
 			end
 
 			-- Check if there is enough room in inventory in general.
 			local invAvailable = VorpInv.canCarryItems(_source, total)
 			if invAvailable ~= true then
-				TriggerClientEvent("vorp:TipRight", _source, Config.Language.FullInventory, 4000)
-				return
+				TriggerClientEvent("vorp:TipRight", _source, Config.Language.FullInventory, 4000) return
 			end
 
 			-- Give items
@@ -175,7 +169,7 @@ local function giveReward(context, data, skipfinal)
 						givenMsg = givenMsg .. givenDisplay[k] .. ((v.nmb > 1) and "s" or "")
 					end
 				end
-				VorpInv.addItem(_source, v.item, v.nmb) 
+				VorpInv.addItem(_source, v.item, v.nmb)
 			end
 
 			if givenMsg ~= "" then
@@ -199,4 +193,3 @@ AddEventHandler("vorp_hunting:getJob", function()
     TriggerClientEvent("vorp_hunting:findJob", _source, job)
 
 end)
-

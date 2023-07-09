@@ -5,6 +5,8 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 author 'VORP Core | rubi216 | Artzalez'
 description 'Hunting script for VORP Core'
 
+lua54 "yes"
+
 
 client_script {
     'config.lua',

@@ -1,15 +1,10 @@
 local peltz = {}
 local prompts = GetRandomIntInRange(0, 0xffffff)
 local playerJob
-local VORPcore = {}
-
-TriggerEvent("getCore", function(core)
-    VORPcore = core
-end )
 
 RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
 AddEventHandler("vorp:SelectedCharacter", function(charid)
-    if Config.butcherfunction then 
+    if Config.butcherfunction then
         StartButchers()
     end
 end)
@@ -40,7 +35,7 @@ function StartButchers() -- Loading Butchers Function
         local x, y, z = table.unpack(v.coords)
         if v.butcherped then
             -- Loading Model
-            local hashModel = GetHashKey(v.npcmodel)
+            local hashModel = joaat(v.npcmodel)
             if IsModelValid(hashModel) then
                 RequestModel(hashModel)
                 while not HasModelLoaded(hashModel) do
@@ -60,9 +55,9 @@ function StartButchers() -- Loading Butchers Function
             SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
         end
         if v.showblip then
-        local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
-        SetBlipSprite(blip, v.blip, true) -- Blip Texture
-        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
+            local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
+            SetBlipSprite(blip, v.blip, true) -- Blip Texture
+            Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
         end
     end
 end
@@ -70,15 +65,12 @@ end
 function awardQuality(quality, entity, horse, cb)
     local skinFound = false
     for k, v in pairs(Config.Animals) do
-        if (quality == v.perfect) or (quality == v.good) or (quality == v.poor) then
-			skinFound = k
-			break -- no need to keep looping through the config; micro-optimizations ftw!
+        if quality == v.perfect or quality == v.good or quality == v.poor then
+			skinFound = k break -- no need to keep looping through the config; micro-optimizations ftw!
 		end
     end
 
-    if not skinFound then
-        -- TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000) -- Notification when the animal isn't being sold in the butcher 
-    else
+    if skinFound then
         TriggerServerEvent("vorp_hunting:giveReward", "pelt", {model=skinFound,quality=quality,entity=entity,horse=horse}, false)
 		cb()
     end
@@ -98,8 +90,8 @@ function SellAnimal() -- Selling animal function
             if Config.Animals[model2] ~= nil then -- Fallback for paying for non pelts
                 alreadysoldanimal = true
                 TriggerServerEvent("vorp_hunting:giveReward", "carcass", {model=model2,entity=holding2}, false)
-            elseif (quality2 ~= false and quality2 ~= nil) then --Award pelt if pelt is on horse
-                awardQuality(quality2, holding2, nil, function () 
+            elseif quality2 ~= false and quality2 ~= nil then --Award pelt if pelt is on horse
+                awardQuality(quality2, holding2, nil, function ()
                     alreadysoldanimal = true
                 end)
             end
@@ -109,7 +101,7 @@ function SellAnimal() -- Selling animal function
 				if not y.sold then
 					y.sold = true
 					local q = Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, x - 1)
-					awardQuality(q, nil, {horse = horse, pelt = q}, function () 
+					awardQuality(q, nil, {horse = horse, pelt = q}, function ()
                     	alreadysoldanimal = true
                 	end)
 				end
@@ -145,15 +137,13 @@ function SellAnimal() -- Selling animal function
         end
     end
 
-    if (alreadysoldanimal == false) then
-        if holding == false then
+    if not alreadysoldanimal then
+        if not holding then
             TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000)
         else
             TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000)
         end
     end
-
-    --TriggerEvent("syn_clan:pelts",peltz)
 end
 
 function Keys(table)
@@ -171,8 +161,8 @@ AddEventHandler("onResourceStop",
     end
 end)
 
-Citizen.CreateThread(function()
-    Citizen.Wait(5000)
+CreateThread(function()
+    Wait(5000)
     local str = Config.Language.press
     openButcher = PromptRegisterBegin()
     PromptSetControlAction(openButcher, Config.keys["G"])
@@ -187,10 +177,10 @@ Citizen.CreateThread(function()
     PromptRegisterEnd(openButcher)
 end)
 
-Citizen.CreateThread(function()
-    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true) 
+CreateThread(function()
+    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true)
     while true do
-        Wait(2)
+        Wait(5)
         local player = PlayerPedId()
         local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, player)
         if horse ~= nil then
@@ -205,12 +195,7 @@ Citizen.CreateThread(function()
                 local model = GetEntityModel(holding)
                 if holding ~= false and Config.Animals[model] == nil then
 
-                    local maxpelts = Config.maxpelts
-                    if Config.maxpelts > 3 then --Limit max pelts to 3 as thats what red dead allows on a horse
-                        maxpelts = 3
-                    end
-
-                    if maxpelts > Keys(peltz) then
+                    if Config.maxpelts > Keys(peltz) then
                         local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
                         PromptSetActiveGroupThisFrame(prompts, label)
                         if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
@@ -230,9 +215,9 @@ Citizen.CreateThread(function()
 end)
 
 --  Check for Animals being skinned/plucked/stored
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
-        Citizen.Wait(2)
+        Wait(5)
         local size = GetNumberOfEvents(0)
         if size > 0 then
             for index = 0, size - 1 do
@@ -250,13 +235,12 @@ Citizen.CreateThread(function()
                     local player = PlayerPedId()
                     local playergate = player == ped
 
-                    if model and playergate == true then
+                    if model and playergate then
                         print('Animal Gathered: ' .. model) --remove this if you want
                     end
                     
                     if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
                         TriggerServerEvent("vorp_hunting:giveReward", "skinned", {model=model}, true)
-			--VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
                     end
                 end
             end
@@ -264,9 +248,10 @@ Citizen.CreateThread(function()
     end
 end)
 
-Citizen.CreateThread(function()
-    if Config.butcherfunction then 
+CreateThread(function()
+    if Config.butcherfunction then
         while true do
+            Wait(5)
             local sleep = true
             for i, v in ipairs(Config.Butchers) do
                 local playerCoords = GetEntityCoords(PlayerPedId())
@@ -285,22 +270,21 @@ Citizen.CreateThread(function()
                             end
                             if playerJob == v.butcherjob then
                                 SellAnimal()
-                                Citizen.Wait(200)
+                                Wait(200)
                             else
                                 TriggerEvent("vorp:TipRight", Config.Language.notabutcher .. " : " .. v.butcherjob, 4000)
                             end
                         else
                             SellAnimal()
-                            Citizen.Wait(200)
+                            Wait(200)
                         end
-                        Citizen.Wait(1000)
+                        Wait(1000)
                     end
                 end
             end
             if sleep then
-                Citizen.Wait(500)
+                Wait(500)
             end
-            Citizen.Wait(1)
         end
     end
 end)
@@ -357,5 +341,3 @@ RegisterCommand("hunt", function(source, args, rawCommand)
         FreezeEntityPosition(animal,true)
     end
 end, false)
-
-
