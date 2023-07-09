@@ -32,7 +32,7 @@ Config.aiButcherped = true -- spawn ai butched ped set to false if you dont want
 
 Config.joblocked = false -- lock the butcher so only people with the job can access. u can change access to each butcher by editing this  butcherjob = "butcher"
 
-Config.maxpelts = 3 -- max pelts allowed on back of horse
+Config.maxpelts = 3 -- max pelts allowed on back of horse (can be no higher than 3 due to game limitations)
 
 ------------------- Item Quantity Instructions -----------------
 -- The range for when a skinnableAnimal or Animal has a config value givenAmount of 0.
