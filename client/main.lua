@@ -5,11 +5,11 @@ local VORPcore = {}
 
 TriggerEvent("getCore", function(core)
     VORPcore = core
-end )
+end)
 
 RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
 AddEventHandler("vorp:SelectedCharacter", function(charid)
-    if Config.butcherfunction then 
+    if Config.butcherfunction then
         StartButchers()
     end
 end)
@@ -22,14 +22,13 @@ end)
 RegisterNetEvent('vorp_hunting:finalizeReward')
 AddEventHandler('vorp_hunting:finalizeReward', function(entity, horse)
     -- Remove Animal/Pelt
-    if entity ~= nil then
+    if entity and DoesEntityExist(entity) then
         DeleteEntity(entity)
-        Citizen.InvokeNative(0x5E94EA09E7207C16, entity) --Delete Entity
-        DeletePed(entity)
+        Citizen.InvokeNative(0x5E94EA09E7207C16, entity) --Delete_2 Entity
     end
 
     -- Remove pelt from horse
-    if horse ~= nil then
+    if horse and DoesEntityExist(horse.horse) then
         Citizen.InvokeNative(0x627F7F3A0C4C51FF, horse.horse, horse.pelt)
     end
 end)
@@ -37,10 +36,8 @@ end)
 
 function StartButchers() -- Loading Butchers Function
     for i, v in ipairs(Config.Butchers) do
-        local x, y, z = table.unpack(v.coords)
         if v.butcherped then
-            -- Loading Model
-            local hashModel = GetHashKey(v.npcmodel)
+            local hashModel = joaat(v.npcmodel)
             if IsModelValid(hashModel) then
                 RequestModel(hashModel)
                 while not HasModelLoaded(hashModel) do
@@ -50,96 +47,106 @@ function StartButchers() -- Loading Butchers Function
                 print(v.npcmodel .. " is not valid") -- Concatenations
             end
             -- Spawn Ped
-            local npc = CreatePed(hashModel, x, y, z, v.heading, false, true, true, true)
+            local npc = CreatePed(hashModel, v.coords, v.heading, false, true, true, true)
+            while not npc do
+                Wait(100)
+            end
             Citizen.InvokeNative(0x283978A15512B2FE, npc, true) -- SetRandomOutfitVariation
             SetEntityNoCollisionEntity(PlayerPedId(), npc, false)
             SetEntityCanBeDamaged(npc, false)
             SetEntityInvincible(npc, true)
             Wait(1000)
-            FreezeEntityPosition(npc, true) -- NPC can't escape
+            FreezeEntityPosition(npc, true)            -- NPC can't escape
             SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
         end
         if v.showblip then
-        local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, x, y, z) -- Blip Creation
-        SetBlipSprite(blip, v.blip, true) -- Blip Texture
-        Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername) -- Name of Blip
+            local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords) -- Blip Creation
+            SetBlipSprite(blip, v.blip, true)                                           -- Blip Texture
+            Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername)               -- Name of Blip
         end
     end
 end
 
-function awardQuality(quality, entity, horse, cb)
-    local skinFound = false
+local function awardQuality(quality, entity, horse, cb)
+    local skinFound = nil
     for k, v in pairs(Config.Animals) do
         if (quality == v.perfect) or (quality == v.good) or (quality == v.poor) then
-			skinFound = k
-			break -- no need to keep looping through the config; micro-optimizations ftw!
-		end
+            skinFound = k
+            break -- no need to keep looping through the config; micro-optimizations ftw!
+        end
     end
 
-    if not skinFound then
-        -- TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000) -- Notification when the animal isn't being sold in the butcher 
-    else
-        TriggerServerEvent("vorp_hunting:giveReward", "pelt", {model=skinFound,quality=quality,entity=entity,horse=horse}, false)
-		cb()
+    if skinFound then
+        TriggerServerEvent("vorp_hunting:giveReward", "pelt", {
+            model = skinFound,
+            quality = quality,
+            entity = entity,
+            horse = horse
+        }, false)
+        cb()
     end
 end
 
-function SellAnimal() -- Selling animal function
+local function SellAnimal() -- Selling animal function
     local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, PlayerPedId())
     local alreadysoldanimal = false
     -- Logic for if a horse is detected
-    if horse ~= nil and horse ~= false and NetworkGetEntityOwner(horse) == PlayerId() then
+    if horse and NetworkGetEntityOwner(horse) == PlayerId() then
         -- Check if the horse is holding anything
-        if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) ~= false then
+        if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) then
             local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse) -- Get what the horse is holding
             local model2 = GetEntityModel(holding2)
 
             local quality2 = Citizen.InvokeNative(0x31FEF6A20F00B963, holding2)
-            if Config.Animals[model2] ~= nil then -- Fallback for paying for non pelts
+            if Config.Animals[model2] then -- Fallback for paying for non pelts
                 alreadysoldanimal = true
-                TriggerServerEvent("vorp_hunting:giveReward", "carcass", {model=model2,entity=holding2}, false)
+                local netid = NetworkGetNetworkIdFromEntity(holding2)
+                TriggerServerEvent("vorp_hunting:giveReward", "carcass",
+                    { model = model2, entity = holding2, netid = netid }, false)
             elseif (quality2 ~= false and quality2 ~= nil) then --Award pelt if pelt is on horse
-                awardQuality(quality2, holding2, nil, function () 
+                awardQuality(quality2, holding2, nil, function()
                     alreadysoldanimal = true
                 end)
             end
-        elseif Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) ~= false then
+        elseif Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) then
             for x = #peltz, 1, -1 do
-				y = peltz[x]
-				if not y.sold then
-					y.sold = true
-					local q = Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, x - 1)
-					awardQuality(q, nil, {horse = horse, pelt = q}, function () 
-                    	alreadysoldanimal = true
-                	end)
-				end
+                y = peltz[x]
+                if not y.sold then
+                    y.sold = true
+                    local q = Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, x - 1)
+                    awardQuality(q, nil, { horse = horse, pelt = q }, function()
+                        alreadysoldanimal = true
+                    end)
+                end
                 table.remove(peltz, x)
-			end
+            end
         end
     end
 
     local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
-    if holding ~= false and alreadysoldanimal == false then -- Checking if you are holding an animal
+    if holding and alreadysoldanimal == false then                          -- Checking if you are holding an animal
         local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
-    
+
         local model = GetEntityModel(holding)
-        
-        if holding ~= nil then
+
+        if holding then
             local entityNetworkId = NetworkGetNetworkIdFromEntity(holding)
             SetNetworkIdExistsOnAllMachines(entityNetworkId, true)
             local entityId = NetworkGetEntityFromNetworkId(entityNetworkId)
-            
+
             if not NetworkHasControlOfEntity(entityId) then
                 NetworkRequestControlOfEntity(entityId)
                 NetworkRequestControlOfNetworkId(entityNetworkId)
             end
         end
 
-        if Config.Animals[model] ~= nil then -- Paying for animals
+        if Config.Animals[model] then -- Paying for animals
             alreadysoldanimal = true
-			TriggerServerEvent("vorp_hunting:giveReward", "carcass", {model=model,entity=holding}, false)
+            local netid = NetworkGetNetworkIdFromEntity(holding)
+            TriggerServerEvent("vorp_hunting:giveReward", "carcass", { model = model, entity = holding, netid = netid },
+                false)
         else -- Paying for skins
-            awardQuality(quality, holding, nil, function ()
+            awardQuality(quality, holding, nil, function()
                 alreadysoldanimal = true
             end)
         end
@@ -166,10 +173,10 @@ end
 
 AddEventHandler("onResourceStop",
     function(resourceName)
-    if resourceName == GetCurrentResourceName() then
-        PromptDelete(prompts)
-    end
-end)
+        if resourceName == GetCurrentResourceName() then
+            PromptDelete(prompts)
+        end
+    end)
 
 Citizen.CreateThread(function()
     Citizen.Wait(5000)
@@ -188,23 +195,22 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true) 
+    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true)
     while true do
         Wait(2)
         local player = PlayerPedId()
         local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, player)
         if horse ~= nil then
-
             local playerCoords = GetEntityCoords(player)
             local horsecoords = GetEntityCoords(horse)
             local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, player)
             local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
-            local dist = GetDistanceBetweenCoords(playerCoords.x, playerCoords.y, playerCoords.z, horsecoords.x, horsecoords.y, horsecoords.z, 0)
+            local dist = GetDistanceBetweenCoords(playerCoords.x, playerCoords.y, playerCoords.z, horsecoords.x,
+                horsecoords.y, horsecoords.z, 0)
 
             if 2 > dist then
                 local model = GetEntityModel(holding)
                 if holding ~= false and Config.Animals[model] == nil then
-
                     local maxpelts = 3 -- cant bemore than this
                     if maxpelts > Keys(peltz) then
                         local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
@@ -247,12 +253,12 @@ Citizen.CreateThread(function()
                     local playergate = player == ped
 
                     if model and playergate == true then
-                      --  print('Animal Gathered: ' .. model) --remove this if you want
+                        --  print('Animal Gathered: ' .. model) --remove this if you want
                     end
-                    
+
                     if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
-                        TriggerServerEvent("vorp_hunting:giveReward", "skinned", {model=model}, true)
-			--VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
+                        TriggerServerEvent("vorp_hunting:giveReward", "skinned", { model = model }, true)
+                        --VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
                     end
                 end
             end
@@ -261,13 +267,12 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-    if Config.butcherfunction then 
+    if Config.butcherfunction then
         while true do
             local sleep = true
             for i, v in ipairs(Config.Butchers) do
                 local playerCoords = GetEntityCoords(PlayerPedId())
                 if Vdist(playerCoords, v.coords) <= v.radius then -- Checking distance between player and butcher
-
                     sleep = false
                     local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.sell)
                     PromptSetActiveGroupThisFrame(prompts, label)
@@ -310,7 +315,7 @@ end)
     local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
     local model = GetEntityModel(holding)
     local type = GetPedType(holding)
-    local hash = GetHashKey(holding)
+    local hash = joaat(holding)
 
     if Config.DevMode then
 
@@ -321,7 +326,8 @@ end)
         print('hash', hash)
 
     end
-end, false) ]]--
+end, false) ]]
+--
 
 ----------- spawn an animal to make tests ------------------
 
@@ -330,7 +336,7 @@ end, false) ]]--
     local freeze = args[2]
     local player = PlayerPedId()
     local playerCoords = GetEntityCoords(player)
-    
+
     if animal == nil then
         animal = 'a_c_goat_01'
     end
@@ -352,6 +358,5 @@ end, false) ]]--
         Wait(freeze)
         FreezeEntityPosition(animal,true)
     end
-end, false) ]]--
-
-
+end, false) ]]
+--
