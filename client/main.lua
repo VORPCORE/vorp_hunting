@@ -205,11 +205,7 @@ Citizen.CreateThread(function()
                 local model = GetEntityModel(holding)
                 if holding ~= false and Config.Animals[model] == nil then
 
-                    local maxpelts = Config.maxpelts
-                    if Config.maxpelts > 3 then --Limit max pelts to 3 as thats what red dead allows on a horse
-                        maxpelts = 3
-                    end
-
+                    local maxpelts = 3 -- cant bemore than this
                     if maxpelts > Keys(peltz) then
                         local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
                         PromptSetActiveGroupThisFrame(prompts, label)
@@ -238,7 +234,7 @@ Citizen.CreateThread(function()
             for index = 0, size - 1 do
                 local event = GetEventAtIndex(0, index)
                 if event == 1376140891 then
-                    local view = exports["vorp_hunting"]:DataViewNativeGetEventData(0, index, 3)
+                    local view = exports[GetCurrentResourceName()]:DataViewNativeGetEventData(0, index, 3)
                     local pedGathered = view['2']
                     local ped = view['0']
                     local model = GetEntityModel(pedGathered)
@@ -251,7 +247,7 @@ Citizen.CreateThread(function()
                     local playergate = player == ped
 
                     if model and playergate == true then
-                        print('Animal Gathered: ' .. model) --remove this if you want
+                      --  print('Animal Gathered: ' .. model) --remove this if you want
                     end
                     
                     if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
@@ -308,7 +304,7 @@ end)
 
 -----  useful to get hash from animals or pelts  ------------
 
-RegisterCommand('animal', function(source, args, rawCommand)
+--[[ RegisterCommand('animal', function(source, args, rawCommand)
     local ped = PlayerPedId()
     local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, ped)
     local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
@@ -325,11 +321,11 @@ RegisterCommand('animal', function(source, args, rawCommand)
         print('hash', hash)
 
     end
-end, false)
+end, false) ]]--
 
 ----------- spawn an animal to make tests ------------------
 
-RegisterCommand("hunt", function(source, args, rawCommand)
+--[[ RegisterCommand("hunt", function(source, args, rawCommand)
     local animal = args[1]
     local freeze = args[2]
     local player = PlayerPedId()
@@ -356,6 +352,6 @@ RegisterCommand("hunt", function(source, args, rawCommand)
         Wait(freeze)
         FreezeEntityPosition(animal,true)
     end
-end, false)
+end, false) ]]--
 
 
