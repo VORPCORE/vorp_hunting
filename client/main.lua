@@ -1,11 +1,9 @@
+---@diagnostic disable: undefined-global
 local peltz = {}
 local prompts = GetRandomIntInRange(0, 0xffffff)
 local playerJob
-local VORPcore = {}
-
-TriggerEvent("getCore", function(core)
-    VORPcore = core
-end)
+local DeleteTable = {}
+local openButcher
 
 RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
 AddEventHandler("vorp:SelectedCharacter", function(charid)
@@ -58,6 +56,7 @@ function StartButchers() -- Loading Butchers Function
             Wait(1000)
             FreezeEntityPosition(npc, true)            -- NPC can't escape
             SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
+            DeleteTable[#DeleteTable + 1] = npc
         end
         if v.showblip then
             local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords) -- Blip Creation
@@ -171,12 +170,14 @@ function Keys(table)
     return num
 end
 
-AddEventHandler("onResourceStop",
-    function(resourceName)
-        if resourceName == GetCurrentResourceName() then
-            PromptDelete(prompts)
-        end
-    end)
+AddEventHandler("onResourceStop", function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        PromptDelete(prompts)
+    end
+    for key, value in ipairs(DeleteTable) do
+        DeleteEntity(value)
+    end
+end)
 
 Citizen.CreateThread(function()
     Citizen.Wait(5000)
@@ -195,7 +196,10 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true)
+    if Config.DevMode then
+        StartButchers()
+    end
+    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true) -- enable mery kil
     while true do
         Wait(2)
         local player = PlayerPedId()
@@ -308,46 +312,43 @@ end)
 
 
 -----  useful to get hash from animals or pelts  ------------
+if Config.DevMode then
+    RegisterCommand('animal', function(source, args, rawCommand)
+        local ped = PlayerPedId()
+        local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, ped)
+        local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
+        local model = GetEntityModel(holding)
+        local type = GetPedType(holding)
+        local hash = joaat(holding)
 
---[[ RegisterCommand('animal', function(source, args, rawCommand)
-    local ped = PlayerPedId()
-    local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, ped)
-    local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
-    local model = GetEntityModel(holding)
-    local type = GetPedType(holding)
-    local hash = joaat(holding)
-
-    if Config.DevMode then
 
         print('holding', holding)
         print('quality', quality)
         print('model', model)
         print('type', type)
         print('hash', hash)
+    end, false)
+    --
 
-    end
-end, false) ]]
---
+    ----------- spawn an animal to make tests ------------------
 
------------ spawn an animal to make tests ------------------
+    RegisterCommand("hunt", function(source, args, rawCommand)
+        local animal = args[1]
+        local freeze = args[2]
+        local player = PlayerPedId()
+        local playerCoords = GetEntityCoords(player)
 
---[[ RegisterCommand("hunt", function(source, args, rawCommand)
-    local animal = args[1]
-    local freeze = args[2]
-    local player = PlayerPedId()
-    local playerCoords = GetEntityCoords(player)
+        if animal == nil then
+            animal = 'a_c_goat_01'
+        end
 
-    if animal == nil then
-        animal = 'a_c_goat_01'
-    end
+        if freeze == nil then
+            freeze = '2000'
+        end
 
-    if freeze == nil then
-        freeze = '2000'
-    end
+        freeze = tonumber(freeze)
 
-    freeze = tonumber(freeze)
 
-    if Config.DevMode then
         RequestModel(animal)
         while not HasModelLoaded(animal) do
             Wait(10)
@@ -356,7 +357,7 @@ end, false) ]]
         animal = CreatePed(animal, playerCoords.x, playerCoords.y, playerCoords.z, true, true, true)
         Citizen.InvokeNative(0x77FF8D35EEC6BBC4, animal, 1, 0)
         Wait(freeze)
-        FreezeEntityPosition(animal,true)
-    end
-end, false) ]]
---
+        FreezeEntityPosition(animal, true)
+    end, false)
+    --
+end
