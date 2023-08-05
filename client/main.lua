@@ -171,6 +171,9 @@ function Keys(table)
 end
 
 AddEventHandler("onResourceStop", function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then
+        return
+    end
     if resourceName == GetCurrentResourceName() then
         PromptDelete(prompts)
     end
@@ -320,7 +323,6 @@ if Config.DevMode then
         local model = GetEntityModel(holding)
         local type = GetPedType(holding)
         local hash = joaat(holding)
-
 
         print('holding', holding)
         print('quality', quality)
