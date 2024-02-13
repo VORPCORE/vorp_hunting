@@ -108,6 +108,7 @@ local function giveReward(context, data, skipfinal, entity)
 
 		if #givenItem ~= #givenAmount then
 			print('Error: Please ensure givenItem and givenAmount have the same length in the items config.')
+			TriggerClientEvent("vorp_hunting:unlock", _source)
 		elseif (givenItem ~= nil) and (#givenItem > 0) then
 			local formattedGivenItems = {}
 			local total = 0
@@ -150,6 +151,7 @@ local function giveReward(context, data, skipfinal, entity)
 
 			if itemsAvailable == false then
 				TriggerClientEvent("vorp:TipRight", _source, Config.Language.FullInventory, 4000)
+				TriggerClientEvent("vorp_hunting:unlock", _source)
 				return
 			end
 
@@ -157,6 +159,7 @@ local function giveReward(context, data, skipfinal, entity)
 			local invAvailable = VorpInv.canCarryItems(_source, total)
 			if invAvailable ~= true then
 				TriggerClientEvent("vorp:TipRight", _source, Config.Language.FullInventory, 4000)
+				TriggerClientEvent("vorp_hunting:unlock", _source)
 				return
 			end
 
@@ -184,9 +187,9 @@ local function giveReward(context, data, skipfinal, entity)
 
 			if givenMsg ~= "" then
 				VorpCore.AddWebhook("Hunting", Config.webhook, GetPlayerName(_source) .. " player received" .. givenMsg,
-					nil, nil, nil,
-					nil, nil)
+					nil, nil, nil, nil, nil)
 				TriggerClientEvent("vorp:TipRight", _source, givenMsg, 4000)
+				TriggerClientEvent("vorp_hunting:unlock", _source)
 			end
 		end
 	end

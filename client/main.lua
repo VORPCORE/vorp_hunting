@@ -4,6 +4,7 @@ local prompts = GetRandomIntInRange(0, 0xffffff)
 local playerJob
 local DeleteTable = {}
 local openButcher
+local pressed = false
 
 RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
 AddEventHandler("vorp:SelectedCharacter", function(charid)
@@ -31,6 +32,9 @@ AddEventHandler('vorp_hunting:finalizeReward', function(entity, horse)
     end
 end)
 
+RegisterNetEvent("vorp_hunting:unlock", function()
+    pressed = false
+end)
 
 function StartButchers() -- Loading Butchers Function
     for i, v in ipairs(Config.Butchers) do
@@ -86,18 +90,19 @@ local function awardQuality(quality, entity, horse, cb)
     end
 end
 
-local function SellAnimal() -- Selling animal function
-    local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, PlayerPedId())
+local function SellAnimal()                                               -- Selling animal function
+    local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, PlayerPedId()) -- _GET_LAST_MOUNT
     local alreadysoldanimal = false
     -- Logic for if a horse is detected
-    if horse and NetworkGetEntityOwner(horse) == PlayerId() then
+
+    if horse and DoesEntityExist(horse) and NetworkGetEntityOwner(horse) == PlayerId() then
         -- Check if the horse is holding anything
-        if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) then
-            local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse) -- Get what the horse is holding
+        if Citizen.InvokeNative(0xA911EE21EDF69DAF, horse) then              -- IS_PED_CARRYING_SOMETHING
+            local holding2 = Citizen.InvokeNative(0xD806CD2A4F2C2996, horse) -- _GET_FIRST_ENTITY_PED_IS_CARRYING
             local model2 = GetEntityModel(holding2)
 
-            local quality2 = Citizen.InvokeNative(0x31FEF6A20F00B963, holding2)
-            if Config.Animals[model2] then -- Fallback for paying for non pelts
+            local quality2 = Citizen.InvokeNative(0x31FEF6A20F00B963, holding2) --_GET_CARRIABLE_FROM_ENTITY
+            if Config.Animals[model2] then                                      -- Fallback for paying for non pelts
                 alreadysoldanimal = true
                 local netid = NetworkGetNetworkIdFromEntity(holding2)
                 TriggerServerEvent("vorp_hunting:giveReward", "carcass",
@@ -107,7 +112,9 @@ local function SellAnimal() -- Selling animal function
                     alreadysoldanimal = true
                 end)
             end
-        elseif Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) then
+        end
+
+        if Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) then -- _GET_PELT_FROM_HORSE
             for x = #peltz, 1, -1 do
                 y = peltz[x]
                 if not y.sold then
@@ -124,7 +131,7 @@ local function SellAnimal() -- Selling animal function
 
     local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId()) -- ISPEDHOLDING
     if holding and alreadysoldanimal == false then                          -- Checking if you are holding an animal
-        local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
+        local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)   -- _GET_CARRIABLE_FROM_ENTITY
 
         local model = GetEntityModel(holding)
 
@@ -154,8 +161,10 @@ local function SellAnimal() -- Selling animal function
     if (alreadysoldanimal == false) then
         if holding == false then
             TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000)
+            pressed = false
         else
             TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000)
+            pressed = false
         end
     end
 
@@ -213,7 +222,7 @@ Citizen.CreateThread(function()
             local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, player)
             local quality = Citizen.InvokeNative(0x31FEF6A20F00B963, holding)
             local dist = GetDistanceBetweenCoords(playerCoords.x, playerCoords.y, playerCoords.z, horsecoords.x,
-                horsecoords.y, horsecoords.z, 0)
+                horsecoords.y, horsecoords.z, false)
 
             if 2 > dist then
                 local model = GetEntityModel(holding)
@@ -276,39 +285,44 @@ end)
 Citizen.CreateThread(function()
     if Config.butcherfunction then
         while true do
-            local sleep = true
+            local sleep = 1000
             for i, v in ipairs(Config.Butchers) do
                 local playerCoords = GetEntityCoords(PlayerPedId())
                 if Vdist(playerCoords, v.coords) <= v.radius then -- Checking distance between player and butcher
-                    sleep = false
+                    sleep = 0
                     local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.sell)
                     PromptSetActiveGroupThisFrame(prompts, label)
 
                     if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
-                        if Config.joblocked then
-                            TriggerServerEvent("vorp_hunting:getJob")
+                        if not pressed then
+                            pressed = true
+                            print('pressed')
 
-                            while playerJob == nil do
-                                Wait(100)
-                            end
-                            if playerJob == v.butcherjob then
-                                SellAnimal()
-                                Citizen.Wait(200)
+                            if Config.joblocked then
+                                TriggerServerEvent("vorp_hunting:getJob")
+                                Citizen.Wait(100)
+
+                                while playerJob == nil do
+                                    Wait(100)
+                                end
+
+                                if playerJob == v.butcherjob then
+                                    SellAnimal()
+                                else
+                                    TriggerEvent("vorp:TipRight", Config.Language.notabutcher .. " : " .. v.butcherjob,
+                                        4000)
+                                    pressed = false
+                                end
                             else
-                                TriggerEvent("vorp:TipRight", Config.Language.notabutcher .. " : " .. v.butcherjob, 4000)
+                                SellAnimal()
                             end
-                        else
-                            SellAnimal()
-                            Citizen.Wait(200)
+                            Citizen.Wait(1000)
                         end
-                        Citizen.Wait(1000)
                     end
                 end
             end
-            if sleep then
-                Citizen.Wait(500)
-            end
-            Citizen.Wait(1)
+
+            Citizen.Wait(sleep)
         end
     end
 end)
