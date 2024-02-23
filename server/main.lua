@@ -185,8 +185,7 @@ local function giveReward(context, data, skipfinal, entity)
 			end
 
 			if givenMsg ~= "" then
-				VorpCore.AddWebhook("Hunting", Config.webhook, GetPlayerName(_source) .. " player received" .. givenMsg,
-					nil, nil, nil, nil, nil)
+				VorpCore.AddWebhook("Hunting", Config.webhook, GetPlayerName(_source) .. " player received" .. givenMsg,nil, nil, nil, nil, nil)
 				TriggerClientEvent("vorp:TipRight", _source, givenMsg, 4000)
 			end
 		end

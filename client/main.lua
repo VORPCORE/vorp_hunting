@@ -2,7 +2,6 @@
 local peltz = {}
 local prompts = GetRandomIntInRange(0, 0xffffff)
 local playerJob
-local DeleteTable = {}
 local openButcher
 local pressed = false
 
@@ -46,7 +45,7 @@ function StartButchers() -- Loading Butchers Function
                     Wait(100)
                 end
             else
-                print(v.npcmodel .. " is not valid") -- Concatenations
+                return print(v.npcmodel .. " is not valid") -- Concatenations
             end
             -- Spawn Ped
             local npc = CreatePed(hashModel, v.coords.x, v.coords.y, v.coords.z, v.heading, false, true, true, true)
@@ -115,7 +114,7 @@ local function SellAnimal()                                               -- Sel
 
         if Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, 0) then -- _GET_PELT_FROM_HORSE
             for x = #peltz, 1, -1 do
-                y = peltz[x]
+                local y = peltz[x]
                 if not y.sold then
                     y.sold = true
                     local q = Citizen.InvokeNative(0x0CEEB6F4780B1F2F, horse, x - 1)
@@ -148,8 +147,8 @@ local function SellAnimal()                                               -- Sel
         if Config.Animals[model] then -- Paying for animals
             alreadysoldanimal = true
             local netid = NetworkGetNetworkIdFromEntity(holding)
-            TriggerServerEvent("vorp_hunting:giveReward", "carcass", { model = model, entity = holding, netid = netid },
-                false)
+            return TriggerServerEvent("vorp_hunting:giveReward", "carcass",
+                { model = model, entity = holding, netid = netid }, false)
         else -- Paying for skins
             awardQuality(quality, holding, nil, function()
                 alreadysoldanimal = true
@@ -160,14 +159,14 @@ local function SellAnimal()                                               -- Sel
     if (alreadysoldanimal == false) then
         if holding == false then
             TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000)
-            pressed = false
         else
             TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000)
-            pressed = false
         end
     end
 
-    --TriggerEvent("syn_clan:pelts",peltz)
+    SetTimeout(5000, function()
+        pressed = false
+    end)
 end
 
 function Keys(table)
@@ -290,7 +289,9 @@ Citizen.CreateThread(function()
             local sleep = 1000
             for i, v in ipairs(Config.Butchers) do
                 local playerCoords = GetEntityCoords(PlayerPedId())
-                if Vdist(playerCoords, v.coords) <= v.radius then -- Checking distance between player and butcher
+                local distance = #(playerCoords - v.coords)
+
+                if distance <= v.radius then -- Checking distance between player and butcher
                     sleep = 0
                     local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.sell)
                     PromptSetActiveGroupThisFrame(prompts, label)
@@ -299,7 +300,7 @@ Citizen.CreateThread(function()
                         if not pressed then
                             pressed = true
                             if Config.joblocked then
-                                TriggerServerEvent("vorp_hunting:getJob")
+                                TriggerServerEvent("vorp_hunting:getJob") --TODO calbacks
                                 while playerJob == nil do
                                     Wait(0)
                                 end
