@@ -312,9 +312,6 @@ Citizen.CreateThread(function()
                             else
                                 SellAnimal()
                             end
-                            SetTimeout(4000, function()
-                                pressed = false
-                            end)
                         end
                     end
                 end
