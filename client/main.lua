@@ -41,7 +41,7 @@ function StartButchers() -- Loading Butchers Function
         if v.butcherped then
             local hashModel = joaat(v.npcmodel)
             if IsModelValid(hashModel) then
-                RequestModel(hashModel)
+                RequestModel(hashModel, false)
                 while not HasModelLoaded(hashModel) do
                     Wait(100)
                 end
@@ -49,10 +49,8 @@ function StartButchers() -- Loading Butchers Function
                 print(v.npcmodel .. " is not valid") -- Concatenations
             end
             -- Spawn Ped
-            local npc = CreatePed(hashModel, v.coords, v.heading, false, true, true, true)
-            while not npc do
-                Wait(100)
-            end
+            local npc = CreatePed(hashModel, v.coords.x, v.coords.y, v.coords.z, v.heading, false, true, true, true)
+            repeat Wait(0) until DoesEntityExist(npc)
             Citizen.InvokeNative(0x283978A15512B2FE, npc, true) -- SetRandomOutfitVariation
             SetEntityNoCollisionEntity(PlayerPedId(), npc, false)
             SetEntityCanBeDamaged(npc, false)
@@ -60,12 +58,13 @@ function StartButchers() -- Loading Butchers Function
             Wait(1000)
             FreezeEntityPosition(npc, true)            -- NPC can't escape
             SetBlockingOfNonTemporaryEvents(npc, true) -- NPC can't be scared
-            DeleteTable[#DeleteTable + 1] = npc
+            Config.Butchers[i].NpcHandle = npc
         end
         if v.showblip then
             local blip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords) -- Blip Creation
             SetBlipSprite(blip, v.blip, true)                                           -- Blip Texture
             Citizen.InvokeNative(0x9CB1A1623062F402, blip, v.butchername)               -- Name of Blip
+            Config.Butchers[i].BlipHandle = blip
         end
     end
 end
@@ -183,11 +182,14 @@ AddEventHandler("onResourceStop", function(resourceName)
     if resourceName ~= GetCurrentResourceName() then
         return
     end
-    if resourceName == GetCurrentResourceName() then
-        PromptDelete(prompts)
-    end
-    for key, value in ipairs(DeleteTable) do
-        DeleteEntity(value)
+
+    for key, value in ipairs(Config.Butchers) do
+        if value.NpcHandle then
+            DeleteEntity(value.NpcHandle)
+        end
+        if value.BlipHandle then
+            RemoveBlip(value.BlipHandle)
+        end
     end
 end)
 
@@ -296,27 +298,23 @@ Citizen.CreateThread(function()
                     if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
                         if not pressed then
                             pressed = true
-                            print('pressed')
-
                             if Config.joblocked then
                                 TriggerServerEvent("vorp_hunting:getJob")
-                                Citizen.Wait(100)
-
                                 while playerJob == nil do
-                                    Wait(100)
+                                    Wait(0)
                                 end
-
                                 if playerJob == v.butcherjob then
                                     SellAnimal()
                                 else
                                     TriggerEvent("vorp:TipRight", Config.Language.notabutcher .. " : " .. v.butcherjob,
                                         4000)
-                                    pressed = false
                                 end
                             else
                                 SellAnimal()
                             end
-                            Citizen.Wait(1000)
+                            SetTimeout(4000, function()
+                                pressed = false
+                            end)
                         end
                     end
                 end
