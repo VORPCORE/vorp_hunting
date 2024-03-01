@@ -514,7 +514,7 @@ Config.SkinnableAnimals = {
 
     [-781967776] = { name = "Legendary White Elk", givenItem = { "venison", "elkantler", "legelks" }, givenAmount = { 1,
         1, 1 }, givenDisplay = { "Venison", "Elk antler", "Legendary Elk pelt" }, money = 0, gold = 0, rolPoints = 0, xp = 1, texture =
-    "MP_A_C_ELK_01", action = "Skinned", type = "satchel_textures" },
+    "animal_elk", action = "Skinned", type = "satchel_textures" },
     [-1747620994] = { name = "Legendary Boa", givenItem = { "stringy", "legendsnakes", "snaket" }, givenAmount = { 1, 1,
         1 }, givenDisplay = { "Stringy meat", "Legendary Boa pelt", "Snake tooth" }, money = 0, gold = 0, rolPoints = 0, xp = 1, texture =
     "animal_snakeblacktailrattle", action = "Skinned", type = "satchel_textures" },
