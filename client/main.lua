@@ -1,30 +1,16 @@
 ---@diagnostic disable: undefined-global
+local Core = exports.vorp_core:GetCore()
 local peltz = {}
 local prompts = GetRandomIntInRange(0, 0xffffff)
-local playerJob
 local openButcher
 local pressed = false
 
-RegisterNetEvent("vorp:SelectedCharacter") -- NPC loads after selecting character
-AddEventHandler("vorp:SelectedCharacter", function(charid)
-    if Config.butcherfunction then
-        StartButchers()
-    end
-end)
-
-RegisterNetEvent('vorp_hunting:findJob')
-AddEventHandler('vorp_hunting:findJob', function(job)
-    playerJob = job
-end)
-
-RegisterNetEvent('vorp_hunting:finalizeReward')
-AddEventHandler('vorp_hunting:finalizeReward', function(entity, horse)
+RegisterNetEvent('vorp_hunting:finalizeReward', function(entity, horse)
     -- Remove Animal/Pelt
     if entity and DoesEntityExist(entity) then
         DeleteEntity(entity)
         Citizen.InvokeNative(0x5E94EA09E7207C16, entity) --Delete_2 Entity
     end
-
     -- Remove pelt from horse
     if horse and DoesEntityExist(horse.horse) then
         Citizen.InvokeNative(0x627F7F3A0C4C51FF, horse.horse, horse.pelt)
@@ -158,9 +144,9 @@ local function SellAnimal()                                               -- Sel
 
     if (alreadysoldanimal == false) then
         if holding == false then
-            TriggerEvent("vorp:TipRight", Config.Language.NotHoldingAnimal, 4000)
+            Core.NotifyObjective(Config.Language.NotHoldingAnimal, 4000)
         else
-            TriggerEvent("vorp:TipRight", Config.Language.NotInTheButcher, 4000)
+            Core.NotifyObjective(Config.Language.NotInTheButcher, 4000)
         end
     end
 
@@ -192,8 +178,8 @@ AddEventHandler("onResourceStop", function(resourceName)
     end
 end)
 
-Citizen.CreateThread(function()
-    Citizen.Wait(5000)
+CreateThread(function()
+    repeat Wait(1000) until LocalPlayer.state.IsInSession
     local str = Config.Language.press
     openButcher = PromptRegisterBegin()
     PromptSetControlAction(openButcher, Config.keys["G"])
@@ -208,13 +194,12 @@ Citizen.CreateThread(function()
     PromptRegisterEnd(openButcher)
 end)
 
-Citizen.CreateThread(function()
-    if Config.DevMode then
-        StartButchers()
-    end
-    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true) -- enable mery kil
+CreateThread(function()
+    repeat Wait(1000) until LocalPlayer.state.IsInSession
+
+    Citizen.InvokeNative(0x39363DFD04E91496, PlayerId(), true) -- enable mercy kil
     while true do
-        Wait(2)
+        local sleep = 1000
         local player = PlayerPedId()
         local horse = Citizen.InvokeNative(0x4C8B59171957BCF7, player)
         if horse ~= nil then
@@ -230,8 +215,10 @@ Citizen.CreateThread(function()
                 if holding ~= false and Config.Animals[model] == nil then
                     local maxpelts = 3 -- cant bemore than this
                     if maxpelts > Keys(peltz) then
+                        sleep = 0
                         local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
                         PromptSetActiveGroupThisFrame(prompts, label)
+
                         if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
                             TaskPlaceCarriedEntityOnMount(player, holding, horse, 1)
                             table.insert(peltz, {
@@ -245,13 +232,16 @@ Citizen.CreateThread(function()
                 end
             end
         end
+        Wait(sleep)
     end
 end)
 
 --  Check for Animals being skinned/plucked/stored
-Citizen.CreateThread(function()
+CreateThread(function()
+    repeat Wait(1000) until LocalPlayer.state.IsInSession
+
     while true do
-        Citizen.Wait(2)
+        Wait(0)
         local size = GetNumberOfEvents(0)
         if size > 0 then
             for index = 0, size - 1 do
@@ -275,7 +265,6 @@ Citizen.CreateThread(function()
 
                     if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
                         TriggerServerEvent("vorp_hunting:giveReward", "skinned", { model = model }, true)
-                        --VORPcore.NotifyAvanced(Config.SkinnableAnimals[model].action.." "..Config.SkinnableAnimals[model].name ,Config.SkinnableAnimals[model].type, Config.SkinnableAnimals[model].texture , "COLOR_PURE_WHITE", 4000)
                     end
                 end
             end
@@ -283,43 +272,46 @@ Citizen.CreateThread(function()
     end
 end)
 
-Citizen.CreateThread(function()
-    if Config.butcherfunction then
-        while true do
-            local sleep = 1000
-            for i, v in ipairs(Config.Butchers) do
-                local playerCoords = GetEntityCoords(PlayerPedId())
-                local distance = #(playerCoords - v.coords)
+CreateThread(function()
+    if not Config.butcherfunction then
+        return
+    end
 
-                if distance <= v.radius then -- Checking distance between player and butcher
-                    sleep = 0
-                    local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.sell)
-                    PromptSetActiveGroupThisFrame(prompts, label)
+    if Config.DevMode or Config.butcherfunction then
+        StartButchers()
+    end
 
-                    if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
-                        if not pressed then
-                            pressed = true
-                            if Config.joblocked then
-                                TriggerServerEvent("vorp_hunting:getJob") --TODO calbacks
-                                while playerJob == nil do
-                                    Wait(0)
-                                end
-                                if playerJob == v.butcherjob then
-                                    SellAnimal()
-                                else
-                                    TriggerEvent("vorp:TipRight", Config.Language.notabutcher .. " : " .. v.butcherjob,
-                                        4000)
-                                end
-                            else
+    while true do
+        local sleep = 1000
+        for i, v in ipairs(Config.Butchers) do
+            local playerCoords = GetEntityCoords(PlayerPedId())
+            local distance = #(playerCoords - v.coords)
+
+            if distance <= v.radius then
+                sleep = 0
+                local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.sell)
+                PromptSetActiveGroupThisFrame(prompts, label)
+
+                if Citizen.InvokeNative(0xC92AC953F0A982AE, openButcher) then
+                    if not pressed then
+                        pressed = true
+                        if Config.joblocked then
+                            local result = Core.Callback.TriggerAwait("vorp_hunting:GetPlayerJob", args)
+                            local playerJob = result
+                            if playerJob == v.butcherjob then
                                 SellAnimal()
+                            else
+                                Core.NotifyObjective(Config.Language.notabutcher .. " : " .. v.butcherjob, 4000)
                             end
+                        else
+                            SellAnimal()
                         end
                     end
                 end
             end
-
-            Citizen.Wait(sleep)
         end
+
+        Wait(sleep)
     end
 end)
 
@@ -361,15 +353,14 @@ if Config.DevMode then
         freeze = tonumber(freeze)
 
 
-        RequestModel(animal)
+        RequestModel(animal, false)
         while not HasModelLoaded(animal) do
             Wait(10)
         end
 
-        animal = CreatePed(animal, playerCoords.x, playerCoords.y, playerCoords.z, true, true, true)
+        animal = CreatePed(animal, playerCoords.x, playerCoords.y, playerCoords.z, 0.0, true, false, false, false)
         Citizen.InvokeNative(0x77FF8D35EEC6BBC4, animal, 1, 0)
         Wait(freeze)
         FreezeEntityPosition(animal, true)
     end, false)
-    --
 end

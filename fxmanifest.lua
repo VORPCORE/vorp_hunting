@@ -18,9 +18,7 @@ server_script {
     'server/main.lua'
 }
 
-exports {
-    'DataViewNativeGetEventData'
-}
+export 'DataViewNativeGetEventData'
 
 
 --dont touch
