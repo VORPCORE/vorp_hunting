@@ -1,3 +1,7 @@
+<1.0.5>
+- refactored event loot removed js file
+- ability to delete pelt after skinning
+- make sure to update fxmanifest as well
 <1.0.4>
 - added new function you can now add for **each item** a random ammount that a player can get from **each animal**.
 - update all files

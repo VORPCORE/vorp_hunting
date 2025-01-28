@@ -160,6 +160,7 @@ Config.Butchers = {
 -- 3. givenAmount = {0} will set an amount to random amount between ItemQuantity Max/Min
 -- 4. givenAmount = {{2,5}} will set an amount to random between the first and second numbers in the supplied table, for the corresponding givenItem.
 -- For example: givenItem = {"meat", "feathers", "claws", "beak"}, givenAmount = {{1,4}, {2,5}, 0, 1} will result in 1 to 4 "meat", 2 to 5 "feathers", ItemQuantity.Min to ItemQuanity.Max "claws" and 1 "beak".
+-- do deletePelt = true, to delete the pelt after taking from animals
 
 ----------------- !IMPORTANT! -----------------
 -- TO ADD MORE ANIMALS AND FIND HASHES, HOLD ANIMALS OR PELTS AND DO /ANIMAL command
@@ -178,8 +179,7 @@ Config.SkinnableAnimals = {
         gold = 0,
         rolPoints = 0,
         xp = 1,
-        texture =
-        "animal_rat",
+        texture = "animal_rat",
         action = "Picked",
         type = "satchel_textures"
     },
@@ -1088,8 +1088,7 @@ Config.SkinnableAnimals = {
         action = "Skinned",
         type = "satchel_textures"
     },
-
-    ----------------------------------------------------------------------------------------------------DIRECT INVENTORY ITEMS (small animal which are directly added to the inventory)------------------------------------------------------------------------------
+    --DIRECT INVENTORY ITEMS (small animal which are directly added to the inventory)-------
 
     [703712157]   = {
         name = "Large Bullhead Catfish",
@@ -1758,7 +1757,6 @@ Config.SkinnableAnimals = {
 }
 
 -- Animals that are traded in to the butcher
-
 
 Config.Animals = {
     -- Animals

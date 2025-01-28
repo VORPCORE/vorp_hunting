@@ -7,22 +7,18 @@ description 'A Hunting script for vorp core framework'
 repository 'https://github.com/VORPCORE/VORP-Hunting'
 lua54 'yes'
 
+shared_script "config.lua"
 
-client_script {
-    'config.lua',
+client_scripts {
+    '@vorp_core/client/dataview.lua',
     'client/main.lua',
-    'client/main.js'
 }
-server_script {
-    'config.lua',
-    'server/main.lua'
-}
+server_script 'server/main.lua'
 
-export 'DataViewNativeGetEventData'
 
 
 --dont touch
-version '1.0.4'
+version '1.0.5'
 vorp_checker 'yes'
 vorp_name '^4Resource version Check^3'
 vorp_github 'https://github.com/VORPCORE/VORP-Hunting'

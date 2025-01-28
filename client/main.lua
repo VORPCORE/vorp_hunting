@@ -34,9 +34,10 @@ function StartButchers() -- Loading Butchers Function
                 return print(v.npcmodel .. " is not valid") -- Concatenations
             end
             -- Spawn Ped
-            local npc = CreatePed(hashModel, v.coords.x, v.coords.y, v.coords.z, v.heading, false, true, true, true)
+            local npc = CreatePed(hashModel, v.coords.x, v.coords.y, v.coords.z, v.heading, false, false, false, false)
             repeat Wait(0) until DoesEntityExist(npc)
             Citizen.InvokeNative(0x283978A15512B2FE, npc, true) -- SetRandomOutfitVariation
+            PlaceEntityOnGroundProperly(npc, true)
             SetEntityNoCollisionEntity(PlayerPedId(), npc, false)
             SetEntityCanBeDamaged(npc, false)
             SetEntityInvincible(npc, true)
@@ -155,13 +156,6 @@ local function SellAnimal()                                               -- Sel
     end)
 end
 
-function Keys(table)
-    local num = 0
-    for k, v in pairs(table) do
-        num = num + 1
-    end
-    return num
-end
 
 AddEventHandler("onResourceStop", function(resourceName)
     if resourceName ~= GetCurrentResourceName() then
@@ -183,7 +177,7 @@ CreateThread(function()
     local str = Config.Language.press
     openButcher = PromptRegisterBegin()
     PromptSetControlAction(openButcher, Config.keys["G"])
-    str = CreateVarString(10, 'LITERAL_STRING', str)
+    str = VarString(10, 'LITERAL_STRING', str)
     PromptSetText(openButcher, str)
     PromptSetEnabled(openButcher, 1)
     PromptSetVisible(openButcher, 1)
@@ -214,7 +208,7 @@ CreateThread(function()
                 local model = GetEntityModel(holding)
                 if holding ~= false and Config.Animals[model] == nil then
                     local maxpelts = 3 -- cant bemore than this
-                    if maxpelts > Keys(peltz) then
+                    if maxpelts > #peltz then
                         sleep = 0
                         local label = CreateVarString(10, 'LITERAL_STRING', Config.Language.stow)
                         PromptSetActiveGroupThisFrame(prompts, label)
@@ -246,25 +240,37 @@ CreateThread(function()
         if size > 0 then
             for index = 0, size - 1 do
                 local event = GetEventAtIndex(0, index)
-                if event == 1376140891 then
-                    local view = exports[GetCurrentResourceName()]:DataViewNativeGetEventData(0, index, 3)
-                    local pedGathered = view['2']
-                    local ped = view['0']
-                    local model = GetEntityModel(pedGathered)
+                if event == `EVENT_LOOT_COMPLETE` then
+                    local eventDataSize = 3
+                    local eventDataStruct = DataView.ArrayBuffer(24)
+                    eventDataStruct:SetInt32(0, 0)
+                    eventDataStruct:SetInt32(8, 0)
+                    eventDataStruct:SetInt32(16, 0)
+                    local is_data_exists = Citizen.InvokeNative(0x57EC5FA4D4D6AFCA, 0, index, eventDataStruct:Buffer(),
+                        eventDataSize)
+                    if is_data_exists then
+                        if PlayerPedId() == eventDataStruct:GetInt32(0) then
+                            local pedid = eventDataStruct:GetInt32(8)
+                            if eventDataStruct:GetInt32(16) == 1 then
+                                local model = GetEntityModel(pedid)
+                                if model and Config.SkinnableAnimals[model] then
+                                    if Config.SkinnableAnimals[model].deletePelt then
+                                        Wait(1000)
+                                        local holding = Citizen.InvokeNative(0xD806CD2A4F2C2996, PlayerPedId())
+                                        local isPelt = GetIsCarriablePelt(holding) == 1
+                                        local isAnimal = GetIsAnimal(holding) == 1
 
-                    -- Bool to let you know if animation/longpress was enacted.
-                    local bool_unk = view['4']
+                                        if isPelt and not isAnimal then
+                                            SetEntityAsMissionEntity(pedid, true, true)
+                                            SetEntityAsNoLongerNeeded(pedid)
 
-                    -- Ensure the player who enacted the event is the one who gets the rewards
-                    local player = PlayerPedId()
-                    local playergate = player == ped
-
-                    if model and playergate == true then
-                        --  print('Animal Gathered: ' .. model) --remove this if you want
-                    end
-
-                    if model and Config.SkinnableAnimals[model] ~= nil and playergate == true and bool_unk == 1 then
-                        TriggerServerEvent("vorp_hunting:giveReward", "skinned", { model = model }, true)
+                                            DeleteEntity(pedid)
+                                        end
+                                    end
+                                    TriggerServerEvent("vorp_hunting:giveReward", "skinned", { model = model }, true)
+                                end
+                            end
+                        end
                     end
                 end
             end
