@@ -261,10 +261,10 @@ CreateThread(function()
                                         local isAnimal = GetIsAnimal(holding) == 1
 
                                         if isPelt and not isAnimal then
-                                            SetEntityAsMissionEntity(pedid, true, true)
-                                            SetEntityAsNoLongerNeeded(pedid)
+                                            SetEntityAsMissionEntity(holding, true, true)
+                                            SetEntityAsNoLongerNeeded(holding)
 
-                                            DeleteEntity(pedid)
+                                            DeleteEntity(holding)
                                         end
                                     end
                                     TriggerServerEvent("vorp_hunting:giveReward", "skinned", { model = model }, true)
