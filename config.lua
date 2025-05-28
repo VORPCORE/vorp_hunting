@@ -22,7 +22,10 @@ Config.Language = {
     join = ", ",
     FullInventory = "Inventory is too full."
 }
-Config.webhook = "link" -- sale of pelts and money receive
+
+-- Webhook moved to server.lua line 98 
+
+
 ------------------- PROMPT -----------------
 Config.keys = {
     G = 0x760A9C6F, -- butcher sell and Stow

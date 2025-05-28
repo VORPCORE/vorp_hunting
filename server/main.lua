@@ -95,8 +95,11 @@ local function giveReward(context, data, skipfinal)
 			Character.addXp(xp)
 		end
 
+		local Webhook = ""  -- Set your webhook URL here
+
+
 		if #monies > 0 then
-			VorpCore.AddWebhook("Hunting", Config.webhook,
+			VorpCore.AddWebhook("Hunting", Webhook,
 				GetPlayerName(_source) .. " " .. "player received" .. table.concat(monies, ", "), nil, nil, nil, nil, nil)
 			VorpCore.NotifyObjective(_source, Config.Language.AnimalSold .. table.concat(monies, ", "), 4000)
 		end
@@ -167,7 +170,7 @@ local function giveReward(context, data, skipfinal)
 			end
 
 			if givenMsg ~= "" then
-				VorpCore.AddWebhook("Hunting", Config.webhook, GetPlayerName(_source) .. " player received" .. givenMsg)
+				VorpCore.AddWebhook("Hunting", Webhook, GetPlayerName(_source) .. " player received" .. givenMsg)
 				VorpCore.NotifyRightTip(_source, givenMsg, 5000)
 			end
 		end
