@@ -1,11 +1,27 @@
 local VorpCore = exports.vorp_core:GetCore()
 
+CreateThread(function()
+	-- only register if jobs are actually goinbg to be used
+	if Config.joblocked then
+		local jobs = {}
+		for _, job in ipairs(Config.Butchers) do
+			if job.butcherjob and job.butcherjob ~= "" then
+				jobs[job.butcherjob] = {}
+			end
+		end
+
+		if VorpCore.RegisterJobs and next(jobs) then
+			VorpCore.RegisterJobs(jobs, GetCurrentResourceName())
+		end
+	end
+end)
+
 local function giveReward(context, data, skipfinal)
 	local _source = source
 	local Character = VorpCore.getUser(_source).getUsedCharacter
 
 	if Config.joblocked then -- security check
-		for index, value in ipairs(Config.Butchers) do
+		for _, value in ipairs(Config.Butchers) do
 			if Character.job == value.butcherjob then
 				TriggerClientEvent("vorp_hunting:lock", _source)
 				VorpCore.NotifyObjective(_source, "is job locked", 4000)
@@ -95,7 +111,7 @@ local function giveReward(context, data, skipfinal)
 			Character.addXp(xp)
 		end
 
-		local Webhook = ""  -- Set your webhook URL here
+		local Webhook = "" -- Set your webhook URL here
 
 
 		if #monies > 0 then
