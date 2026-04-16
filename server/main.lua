@@ -2,18 +2,22 @@ local VorpCore = exports.vorp_core:GetCore()
 
 CreateThread(function()
 	-- only register if jobs are actually goinbg to be used
-	if Config.joblocked then
-		local jobs = {}
-		for _, job in ipairs(Config.Butchers) do
-			if job.butcherjob and job.butcherjob ~= "" then
-				jobs[job.butcherjob] = {}
-			end
-		end
+	if VorpCore.RegisterJobs then
+	   if Config.joblocked then
+		  local jobs <const> = {}
+		  for _, job in ipairs(Config.Butchers) do
+			  if job.butcherjob and job.butcherjob ~= "" then
+				  jobs[job.butcherjob] = {}
+			  end
+		  end
 
-		if VorpCore.RegisterJobs and next(jobs) then
-			VorpCore.RegisterJobs(jobs, GetCurrentResourceName())
-		end
-	end
+		  if next(jobs) then
+			  VorpCore.RegisterJobs(jobs, GetCurrentResourceName())
+		  end
+	   end
+	else
+			--print("update vorp core register jobs not found")
+	end		
 end)
 
 local function giveReward(context, data, skipfinal)
